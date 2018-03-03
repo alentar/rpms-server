@@ -43,7 +43,7 @@ gulp.task('lint', () => {
 gulp.task('apidoc', (done) => {
   apidoc({
     src: './src/',
-    dest: 'docs',
+    dest: 'docs/docs',
     config: './',
     excludeFilters: [ 'node_modules', 'public' ]
   }, done)
