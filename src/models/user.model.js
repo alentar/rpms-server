@@ -5,9 +5,7 @@ const httpStatus = require('http-status')
 const APIError = require('../utils/APIError')
 const Schema = mongoose.Schema
 
-const roles = [
-  'user', 'admin'
-]
+const roles = [ 'nurse', 'doctor', 'admin' ]
 
 const userSchema = new Schema({
   email: {
