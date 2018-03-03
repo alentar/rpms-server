@@ -12,7 +12,7 @@ exports.register = async (req, res, next) => {
     res.status(httpStatus.CREATED)
     res.send(savedUser.transform())
   } catch (error) {
-    return next(User.checkDuplicateEmailError(error))
+    return next(User.checkDuplicateNicError(error))
   }
 }
 

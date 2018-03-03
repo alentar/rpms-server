@@ -8,11 +8,13 @@ const Schema = mongoose.Schema
 const roles = [ 'nurse', 'doctor', 'admin' ]
 
 const userSchema = new Schema({
-  email: {
+  nic: {
     type: String,
     required: true,
     unique: true,
-    lowercase: true
+    lowercase: true,
+    minlength: 9,
+    maxlength: 12
   },
   password: {
     type: String,
@@ -26,7 +28,7 @@ const userSchema = new Schema({
   },
   role: {
     type: String,
-    default: 'user',
+    default: 'nurse',
     enum: roles
   }
 }, {
@@ -50,7 +52,7 @@ userSchema.pre('save', async function save (next) {
 userSchema.method({
   transform () {
     const transformed = {}
-    const fields = ['id', 'name', 'email', 'createdAt', 'role']
+    const fields = ['id', 'name', 'nic', 'createdAt', 'role']
 
     fields.forEach((field) => {
       transformed[field] = this[field]
@@ -67,13 +69,13 @@ userSchema.method({
 userSchema.statics = {
   roles,
 
-  checkDuplicateEmailError (err) {
+  checkDuplicateNicError (err) {
     if (err.code === 11000) {
-      var error = new Error('Email already taken')
+      var error = new Error('Nic already taken')
       error.errors = [{
-        field: 'email',
+        field: 'nic',
         location: 'body',
-        messages: ['Email already taken']
+        messages: ['Nic already taken']
       }]
       error.status = httpStatus.CONFLICT
       return error
@@ -83,11 +85,11 @@ userSchema.statics = {
   },
 
   async findAndGenerateToken (payload) {
-    const { email, password } = payload
-    if (!email) throw new APIError('Email must be provided for login')
+    const { nic, password } = payload
+    if (!nic) throw new APIError('Nic must be provided for login')
 
-    const user = await this.findOne({ email }).exec()
-    if (!user) throw new APIError(`No user associated with ${email}`, httpStatus.NOT_FOUND)
+    const user = await this.findOne({ nic }).exec()
+    if (!user) throw new APIError(`No user associated with ${nic}`, httpStatus.NOT_FOUND)
 
     const passwordOK = await user.passwordMatches(password)
 
