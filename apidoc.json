@@ -1,0 +1,8 @@
+{
+  "name": "RPMS API documentation",
+  "version": "1.0.0",
+  "description": "API of the Realtime Patient Monitoring System",
+  "template": {
+      "forceLanguage": "en"
+  }
+}

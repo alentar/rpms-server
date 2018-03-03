@@ -10,6 +10,7 @@ const errorHandler = require('../middlewares/error-handler')
 const apiRouter = require('../routes/api')
 const passport = require('passport')
 const passportJwt = require('../services/passport')
+var path = require('path')
 
 const app = express()
 app.use(bodyParser.json())
@@ -33,7 +34,7 @@ exports.start = () => {
       process.exit(-1)
     }
 
-    console.log(`${config.app} is running on ${config.port}`)
+    console.log(`${config.app} is running on http://localhost:${config.port}`)
   })
 }
 
