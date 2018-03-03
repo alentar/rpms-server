@@ -1,4 +1,4 @@
-{
+define({
   "name": "RPMS API documentation",
   "version": "1.0.0",
   "description": "API of the Realtime Patient Monitoring System",
@@ -10,8 +10,8 @@
   "apidoc": "0.3.0",
   "generator": {
     "name": "apidoc",
-    "time": "2018-03-03T23:10:45.009Z",
+    "time": "2018-03-03T23:33:05.658Z",
     "url": "http://apidocjs.com",
     "version": "0.17.6"
   }
-}
+});
