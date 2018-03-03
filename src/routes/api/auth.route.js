@@ -7,7 +7,36 @@ const validator = require('express-validation')
 const { create } = require('../../validations/user.validation')
 const auth = require('../../middlewares/authorization')
 
+/**
+ *
+ * @api {POST} /auth/register Register a new User to application
+ * @apiName apiName
+ * @apiGroup Authentication
+ * @apiVersion  1.0.0
+ *
+ *
+ * @apiParam  {String} nic NIC of the user to be registred
+ * @apiParam  {String} name Name of the User
+ * @apiParam  {String="admin", "doctor", "nurse"} [role="nurse"] role Role of the user
+ * @apiParam  {String} [password] password Password of user, auto generated if not present
+ *
+ * @apiSuccess (200) {String} id description
+ *
+ * @apiParamExample  {type} Request-Example:
+ * {
+ *     property : value
+ * }
+ *
+ *
+ * @apiSuccessExample {type} Success-Response:
+ * {
+ *     property : value
+ * }
+ *
+ *
+ */
 router.post('/register', validator(create), authController.register) // validate and register
+
 router.post('/login', authController.login) // login
 
 // Authentication example
