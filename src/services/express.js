@@ -23,9 +23,6 @@ if (config.env !== 'test') app.use(morgan('combined'))
 app.use(passport.initialize())
 passport.use('jwt', passportJwt.jwt)
 
-// mount docs
-app.use(express.static(path.resolve(path.join(__dirname, '/../../public'))))
-
 app.use('/api', apiRouter)
 app.use(errorHandler.handleNotFound)
 app.use(errorHandler.handleError)
