@@ -9,9 +9,12 @@ const seq = require('run-sequence')
 
 gulp.task('nodemon', () => {
   nodemon({
-    script: './src/index.js',
+    script: 'src/index.js',
     ext: 'js',
+    ignore: ['node_modules/**', 'public/**'],
     env: { 'NODE_ENV': 'dev' }
+  }).on('restart', function (files) {
+    console.log('App restarted due to: ', files)
   })
 })
 
@@ -42,12 +45,12 @@ gulp.task('apidoc', (done) => {
     src: './src/',
     dest: 'public/docs',
     config: './',
-    excludeFilters: [ 'node_modules', 'public/docs' ]
+    excludeFilters: [ 'node_modules', 'public' ]
   }, done)
 })
 
 gulp.task('watch', () => {
-  gulp.watch([ '!node_modules/', 'src/**/*.js' ], ['lint', 'apidoc'])
+  gulp.watch([ '!node_modules/', '!public/', 'src/**/*.js' ], [ 'lint', 'apidoc' ])
 })
 
 gulp.task('default', (cb) => {
