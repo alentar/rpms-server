@@ -1,4 +1,4 @@
-# Express Mongo JWT Boilerplate [![Build Status](https://travis-ci.org/kasvith/express-mongo-jwt-boilerplate.svg?branch=master)](https://travis-ci.org/kasvith/express-mongo-jwt-boilerplate)
+# Express Mongo JWT Boilerplate [![Build Status](https://travis-ci.org/alentar/rpms-server.svg?branch=master)](https://travis-ci.org/alentar/rpms-server)
 
 ## Installation
 
