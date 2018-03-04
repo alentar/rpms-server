@@ -11,7 +11,7 @@ gulp.task('nodemon', () => {
   nodemon({
     script: 'src/index.js',
     ext: 'js',
-    ignore: ['node_modules/**', 'public/**'],
+    ignore: ['node_modules/**', 'docs/**'],
     env: { 'NODE_ENV': 'dev' }
   }).on('restart', function (files) {
     console.log('App restarted due to: ', files)
@@ -34,7 +34,7 @@ gulp.task('test', () => {
 })
 
 gulp.task('lint', () => {
-  return gulp.src(['src/**/*.js', '!public/**', '!node_modules/**'])
+  return gulp.src(['src/**/*.js', '!docs/**', '!node_modules/**'])
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failAfterError())
@@ -45,14 +45,14 @@ gulp.task('apidoc', (done) => {
     src: './src/',
     dest: 'docs/docs',
     config: './',
-    excludeFilters: [ 'node_modules', 'public' ]
+    excludeFilters: [ 'node_modules', 'docs']
   }, done)
 })
 
 gulp.task('watch', () => {
-  gulp.watch([ '!node_modules/', '!public/', 'src/**/*.js' ], [ 'lint', 'apidoc' ])
+  gulp.watch([ '!node_modules/', '!docs/' ,'src/**/*.js' ], [ 'lint' ])
 })
 
 gulp.task('default', (cb) => {
-  seq('lint', 'apidoc', 'nodemon', cb)
+  seq('nodemon', 'lint', cb)
 })
