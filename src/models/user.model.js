@@ -23,9 +23,22 @@ const userSchema = new Schema({
     maxlength: 128
   },
   name: {
-    type: String,
-    maxlength: 50
+    first: {
+      type: String,
+      required: true,
+      maxlength: 25
+    },
+    last: {
+      type: String,
+      required: true,
+      maxlength: 25
+    }
   },
+  registerID: {
+    type: String,
+    default: ''
+  },
+  contacts: [{type: String}],
   role: {
     type: String,
     default: 'nurse',
@@ -52,7 +65,7 @@ userSchema.pre('save', async function save (next) {
 userSchema.method({
   transform () {
     const transformed = {}
-    const fields = ['id', 'name', 'nic', 'createdAt', 'role']
+    const fields = ['id', 'name', 'nic', 'createdAt', 'role', 'registerID', 'contacts']
 
     fields.forEach((field) => {
       transformed[field] = this[field]
@@ -98,5 +111,7 @@ userSchema.statics = {
     return user
   }
 }
+
+exports.roles = roles
 
 module.exports = mongoose.model('User', userSchema)
