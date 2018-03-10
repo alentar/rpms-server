@@ -4,6 +4,7 @@ const User = require('../models/user.model')
 const jwt = require('jsonwebtoken')
 const config = require('../config')
 const httpStatus = require('http-status')
+const APIError = require('../utils/APIError')
 
 exports.register = async (req, res, next) => {
   try {
@@ -33,4 +34,19 @@ exports.login = async (req, res, next) => {
   } catch (error) {
     next(error)
   }
+}
+
+exports.validate = async (req, res, next) => {
+  const user = req.user
+  const payload = {sub: user.id}
+  const token = jwt.sign(payload, config.secret)
+
+  return res.json({
+    user: {
+      _id: user.id,
+      name: user.name,
+      role: user.role
+    },
+    token: token
+  })
 }
