@@ -39,6 +39,8 @@ router.post('/register', validator(create), authController.register) // validate
 
 router.post('/login', authController.login) // login
 
+router.post('/validate/token', auth(), authController.validate) // validate token
+
 // Authentication example
 router.get('/secret1', auth(), (req, res) => {
   // example route for auth
