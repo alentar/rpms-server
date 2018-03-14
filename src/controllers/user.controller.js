@@ -8,6 +8,8 @@ const { omit, compact } = require('lodash')
 
 exports.create = async (req, res, next) => {
   try {
+    if (!req.body.password) req.body.password = req.body.nic
+
     const user = new User(req.body)
     const savedUser = await user.save()
     res.status(httpStatus.CREATED)
@@ -52,7 +54,7 @@ exports.update = async (req, res, next) => {
     if (!ObjectId.isValid(req.params.userID)) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
 
     const omitRole = req.user.role !== 'admin' ? 'role' : ''
-    const userObj = omit(req.body, compact([omitRole, '_id']))
+    const userObj = omit(req.body, compact([omitRole, 'id', '_id', 'password']))
     const user = await User.findByIdAndUpdate(req.params.userID, userObj, {new: true})
     return res.json({user: user.transform()})
   } catch (error) {

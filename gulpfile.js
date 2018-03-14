@@ -45,12 +45,12 @@ gulp.task('apidoc', (done) => {
     src: './src/',
     dest: 'docs/docs',
     config: './',
-    excludeFilters: [ 'node_modules', 'docs']
+    excludeFilters: [ 'node_modules', 'docs' ]
   }, done)
 })
 
 gulp.task('watch', () => {
-  gulp.watch([ '!node_modules/', '!docs/' ,'src/**/*.js' ], [ 'lint' ])
+  gulp.watch([ '!node_modules/', '!docs/', 'src/**/*.js' ], [ 'lint' ])
 })
 
 gulp.task('default', (cb) => {
