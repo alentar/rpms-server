@@ -117,6 +117,35 @@ router.post('/', auth(['admin']), validator(create), userController.create)
 
 /**
  *
+ * @api {get} /api/users/me Get current user
+ * @apiName GetCurrentUser
+ * @apiGroup Users
+ * @apiVersion  1.0.0
+ * @apiPermission authorized
+ *
+ * @apiParamExample  {curl} Request-Example:
+ *    curl -H "Authorization: Bearer <access-token>" http://<host>:<port>/api/users/me
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *  {
+  *   "user" :{
+  *     "name": {
+  *       "first": "Jhone",
+  *       "last": "Doe"
+  *     },
+  *     "nic": "22234350279b",
+  *     "registerID": "someawsomeID",
+  *     "password": "mypassword",
+  *     "contatcs": ["1234567890"],
+  *     "role": "admin"
+  *    }
+  * }
+ *
+ */
+router.get('/me', auth(), userController.me)
+
+/**
+ *
  * @api {get} /api/users/:id Get an user
  * @apiName GetUser
  * @apiGroup Users
@@ -138,17 +167,19 @@ router.post('/', auth(['admin']), validator(create), userController.create)
  *  curl -H "Authorization: Bearer <access-token>" http://<host>:<port>/api/users/someuniqueid
  *
  * @apiSuccessExample {json} Success-Response:
- *  {
- *    "name": {
- *      "first": "Jhone",
- *      "last": "Doe"
- *    },
- *    "nic": "22234350279b",
- *    "registerID": "someawsomeID",
- *    "password": "mypassword",
- *    "contatcs": ["1234567890"],
- *    "role": "admin"
- *  }
+*  {
+  *   "user" :{
+  *     "name": {
+  *       "first": "Jhone",
+  *       "last": "Doe"
+  *     },
+  *     "nic": "22234350279b",
+  *     "registerID": "someawsomeID",
+  *     "password": "mypassword",
+  *     "contatcs": ["1234567890"],
+  *     "role": "admin"
+  *    }
+  * }
  *
  * @apiError {404} NotFound     Requested user not found
  * @apiError {500} InvalidID    ID is invalid

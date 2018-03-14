@@ -70,3 +70,7 @@ exports.index = async (req, res, next) => {
     return next(error)
   }
 }
+
+exports.me = (req, res, next) => {
+  return res.json(req.user.transform())
+}

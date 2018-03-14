@@ -476,6 +476,39 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/api/users/me",
+    "title": "Get current user",
+    "name": "GetCurrentUser",
+    "group": "Users",
+    "version": "1.0.0",
+    "permission": [
+      {
+        "name": "authorized"
+      }
+    ],
+    "parameter": {
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "curl -H \"Authorization: Bearer <access-token>\" http://<host>:<port>/api/users/me",
+          "type": "curl"
+        }
+      ]
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": " {\n  \"user\" :{\n    \"name\": {\n      \"first\": \"Jhone\",\n      \"last\": \"Doe\"\n    },\n    \"nic\": \"22234350279b\",\n    \"registerID\": \"someawsomeID\",\n    \"password\": \"mypassword\",\n    \"contatcs\": [\"1234567890\"],\n    \"role\": \"admin\"\n   }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/routes/api/user.route.js",
+    "groupTitle": "Users"
+  },
+  {
+    "type": "get",
     "url": "/api/users/:id",
     "title": "Get an user",
     "name": "GetUser",
@@ -570,7 +603,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "{\n  \"name\": {\n    \"first\": \"Jhone\",\n    \"last\": \"Doe\"\n  },\n  \"nic\": \"22234350279b\",\n  \"registerID\": \"someawsomeID\",\n  \"password\": \"mypassword\",\n  \"contatcs\": [\"1234567890\"],\n  \"role\": \"admin\"\n}",
+          "content": " {\n  \"user\" :{\n    \"name\": {\n      \"first\": \"Jhone\",\n      \"last\": \"Doe\"\n    },\n    \"nic\": \"22234350279b\",\n    \"registerID\": \"someawsomeID\",\n    \"password\": \"mypassword\",\n    \"contatcs\": [\"1234567890\"],\n    \"role\": \"admin\"\n   }\n}",
           "type": "json"
         }
       ]
