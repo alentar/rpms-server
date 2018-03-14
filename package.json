@@ -55,6 +55,7 @@
     "inquirer": "^5.1.0",
     "joi": "^13.1.2",
     "jsonwebtoken": "^8.1.1",
+    "lodash": "^4.17.5",
     "moment": "^2.21.0",
     "moment-timezone": "^0.5.14",
     "mongoose": "^5.0.7",
