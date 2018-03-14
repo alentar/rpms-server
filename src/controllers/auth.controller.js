@@ -1,9 +1,10 @@
 'use strict'
 
 const User = require('../models/user.model')
-const jwt = require('jsonwebtoken')
+const RefreshToken = require('../models/refreshToken.model')
 const config = require('../config')
 const httpStatus = require('http-status')
+const moment = require('moment')
 const APIError = require('../utils/APIError')
 
 exports.register = async (req, res, next) => {
@@ -19,34 +20,42 @@ exports.register = async (req, res, next) => {
 
 exports.login = async (req, res, next) => {
   try {
-    const user = await User.findAndGenerateToken(req.body)
-    const payload = {sub: user.id}
-    const token = jwt.sign(payload, config.secret)
+    const { user, accessToken } = await User.findAndGenerateToken(req.body)
+    const token = await generateTokenResponse(user, accessToken)
 
     return res.json({
-      user:
-        {_id: user.id,
-          name: user.name,
-          role: user.role
-        },
-      token: token
+      user: user.transform(),
+      token
     })
   } catch (error) {
     next(error)
   }
 }
 
-exports.validate = async (req, res, next) => {
-  const user = req.user
-  const payload = {sub: user.id}
-  const token = jwt.sign(payload, config.secret)
+exports.refesh = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.body
+    const refreshObject = await RefreshToken.findOne({token: refreshToken})
 
-  return res.json({
-    user: {
-      _id: user.id,
-      name: user.name,
-      role: user.role
-    },
-    token: token
-  })
+    if (!refreshObject) throw new APIError('Invalid refresh token', httpStatus.UNAUTHORIZED)
+
+    const { user, accessToken } = await User.findAndGenerateToken({refreshObject})
+    const token = await generateTokenResponse(user, accessToken)
+
+    return res.json({
+      token
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+async function generateTokenResponse (user, accessToken) {
+  const tokenType = 'Bearer'
+  const refreshObject = await RefreshToken.generate(user)
+  const refreshToken = refreshObject.token
+  const expiresIn = moment().add(config.tokenExpiration, 'hours')
+  return {
+    tokenType, accessToken, refreshToken, expiresIn
+  }
 }

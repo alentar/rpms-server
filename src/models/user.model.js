@@ -3,6 +3,9 @@ const mongoose = require('mongoose')
 const bcrypt = require('bcrypt-nodejs')
 const httpStatus = require('http-status')
 const APIError = require('../utils/APIError')
+const config = require('../config')
+const jwt = require('jsonwebtoken')
+const moment = require('moment')
 const Schema = mongoose.Schema
 
 const roles = [ 'nurse', 'doctor', 'admin' ]
@@ -76,6 +79,16 @@ userSchema.method({
 
   passwordMatches (password) {
     return bcrypt.compareSync(password, this.password)
+  },
+
+  token () {
+    const payload = {
+      exp: moment().add(config.tokenExpiration, 'hours').unix(),
+      iat: moment().unix(),
+      sub: this._id
+    }
+
+    return jwt.sign(payload, config.secret)
   }
 })
 
@@ -98,7 +111,17 @@ userSchema.statics = {
   },
 
   async findAndGenerateToken (payload) {
-    const { nic, password } = payload
+    const { nic, password, refreshObject } = payload
+
+    // lets issue token if refreshObject is present
+    if (refreshObject) {
+      const user = await User.findOne({userID: refreshObject.userID})
+
+      if (!user) throw new APIError(`Invalid token`, httpStatus.UNAUTHORIZED)
+
+      return { user: user, accessToken: user.token() }
+    }
+
     if (!nic) throw new APIError('Nic must be provided for login')
 
     const user = await this.findOne({ nic }).exec()
@@ -108,10 +131,11 @@ userSchema.statics = {
 
     if (!passwordOK) throw new APIError(`Password mismatch`, httpStatus.UNAUTHORIZED)
 
-    return user
+    return { user: user, accessToken: user.token() }
   }
 }
 
 exports.roles = roles
 
-module.exports = mongoose.model('User', userSchema)
+const User = mongoose.model('User', userSchema)
+module.exports = User
