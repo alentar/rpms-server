@@ -132,6 +132,25 @@ userSchema.statics = {
     if (!passwordOK) throw new APIError(`Password mismatch`, httpStatus.UNAUTHORIZED)
 
     return { user: user, accessToken: user.token() }
+  },
+
+  async list ({page = 1, perPage = 30}) {
+    page = Number(page)
+    perPage = Number(perPage)
+
+    if (!page || page <= 0) throw new APIError('Invalid page')
+    if (!perPage || perPage <= 0) throw new APIError('Invalid perPage')
+
+    const results = await User.find()
+      .limit(perPage)
+      .skip(perPage * (page - 1))
+      .sort({'createdAt': -1})
+
+    const users = results.map((result) => result.transform())
+    const total = await User.count()
+    const pages = Math.ceil(total / perPage)
+
+    return {users, pages, page, perPage, total}
   }
 }
 

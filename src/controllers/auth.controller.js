@@ -7,17 +7,6 @@ const httpStatus = require('http-status')
 const moment = require('moment')
 const APIError = require('../utils/APIError')
 
-exports.register = async (req, res, next) => {
-  try {
-    const user = new User(req.body)
-    const savedUser = await user.save()
-    res.status(httpStatus.CREATED)
-    res.send(savedUser.transform())
-  } catch (error) {
-    return next(User.checkDuplicateNicError(error))
-  }
-}
-
 exports.login = async (req, res, next) => {
   try {
     const { user, accessToken } = await User.findAndGenerateToken(req.body)
