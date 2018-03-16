@@ -1,11 +1,16 @@
 define({ "api": [
   {
-    "type": "POST",
-    "url": "/auth/register",
-    "title": "Register a new User to application",
-    "name": "apiName",
+    "type": "post",
+    "url": "/api/auth/login",
+    "title": "Login",
+    "name": "Login",
     "group": "Authentication",
     "version": "1.0.0",
+    "permission": [
+      {
+        "name": "public"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -14,42 +19,22 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "nic",
-            "description": "<p>NIC of the user to be registred</p>"
+            "description": "<p>NIC of the user</p>"
           },
           {
             "group": "Parameter",
             "type": "String",
             "optional": false,
-            "field": "name",
-            "description": "<p>Name of the User</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "allowedValues": [
-              "\"admin\"",
-              "\"doctor\"",
-              "\"nurse\""
-            ],
-            "optional": true,
-            "field": "role",
-            "defaultValue": "nurse",
-            "description": "<p>role Role of the user</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": true,
             "field": "password",
-            "description": "<p>password Password of user, auto generated if not present</p>"
+            "description": "<p>Password of user</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "Request-Example:",
-          "content": "{\n    property : value\n}",
-          "type": "type"
+          "content": "{\n    \"nic\" : \"123456789v\"\n    \"password\": \"yourpassword\"\n}",
+          "type": "json"
         }
       ]
     },
@@ -58,18 +43,188 @@ define({ "api": [
         "200": [
           {
             "group": "200",
+            "type": "Object",
+            "optional": false,
+            "field": "user",
+            "description": "<p>A user object</p>"
+          },
+          {
+            "group": "200",
+            "type": "Object",
+            "optional": false,
+            "field": "token",
+            "description": "<p>Token object</p>"
+          },
+          {
+            "group": "200",
             "type": "String",
             "optional": false,
-            "field": "id",
-            "description": "<p>description</p>"
+            "field": "token.tokenType",
+            "description": "<p>Type of the token</p>"
+          },
+          {
+            "group": "200",
+            "type": "String",
+            "optional": false,
+            "field": "token.accessToken",
+            "description": "<p>Access Token for user. This is short lived</p>"
+          },
+          {
+            "group": "200",
+            "type": "String",
+            "optional": false,
+            "field": "token.refreshToken",
+            "description": "<p>Refresh Token for user. This is long lived</p>"
+          },
+          {
+            "group": "200",
+            "type": "String",
+            "optional": false,
+            "field": "token.expiresIn",
+            "description": "<p>Access Token expiration time</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "{\n    property : value\n}",
-          "type": "type"
+          "content": "{\n \"user\": {\n     \"id\": \"5aa2242abec1cc0578946ef0\",\n     \"name\": {\n         \"first\": \"Jhon\",\n         \"last\": \"Doe\"\n     },\n     \"nic\": \"111111111v\",\n     \"createdAt\": \"2018-03-09T06:05:30.387Z\",\n     \"role\": \"admin\",\n     \"registerID\": \"1111cvg\",\n     \"contacts\": []\n },\n \"token\": {\n     \"tokenType\": \"Bearer\",\n     \"accessToken\": \"<access-token>\",\n     \"refreshToken\": \"<refresh-token>\",\n     \"expiresIn\": \"2018-03-14T16:58:19.089Z\"\n }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "type": "404",
+            "optional": false,
+            "field": "UserNotFound",
+            "description": "<p>No user found for given credentials</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "type": "401",
+            "optional": false,
+            "field": "PasswordMismatch",
+            "description": "<p>Password is not correct</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "UserNotFound:",
+          "content": "{\n  \"message\": \"No user associated with thisid\",\n  \"extra\": null,\n  \"errors\": {\n      \"name\": \"APIError\",\n      \"message\": \"No user associated with thisid\",\n      \"status\": 404,\n      \"extra\": null\n  }\n}",
+          "type": "json"
+        },
+        {
+          "title": "PasswordMismatch:",
+          "content": "{\n  \"message\": \"Password mismatch\",\n  \"extra\": null,\n  \"errors\": {\n      \"name\": \"APIError\",\n      \"message\": \"Password mismatch\",\n      \"status\": 401,\n      \"extra\": null\n  }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/routes/api/auth.route.js",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "post",
+    "url": "/api/auth/refresh/token",
+    "title": "Refresh Token",
+    "name": "RefreshToken",
+    "group": "Authentication",
+    "version": "1.0.0",
+    "permission": [
+      {
+        "name": "public"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "refrshToken",
+            "description": "<p>A Refreh token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "{\n    \"refrshToken\" : \"<your-token>\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "200": [
+          {
+            "group": "200",
+            "type": "Object",
+            "optional": false,
+            "field": "token",
+            "description": "<p>Token object</p>"
+          },
+          {
+            "group": "200",
+            "type": "String",
+            "optional": false,
+            "field": "token.tokenType",
+            "description": "<p>Type of the token</p>"
+          },
+          {
+            "group": "200",
+            "type": "String",
+            "optional": false,
+            "field": "token.accessToken",
+            "description": "<p>Access Token for user. This is short lived</p>"
+          },
+          {
+            "group": "200",
+            "type": "String",
+            "optional": false,
+            "field": "token.refreshToken",
+            "description": "<p>Refresh Token for user. This is long lived</p>"
+          },
+          {
+            "group": "200",
+            "type": "String",
+            "optional": false,
+            "field": "token.expiresIn",
+            "description": "<p>Access Token expiration time</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": " {\n   \"token\": {\n     \"tokenType\": \"Bearer\",\n     \"accessToken\": \"<access-token>\",\n     \"refreshToken\": \"<refresh-token>\",\n     \"expiresIn\": \"2018-03-14T16:58:19.089Z\"\n   }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "type": "401",
+            "optional": false,
+            "field": "TokenError",
+            "description": "<p>Invalid Token was given</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "UserNotFound:",
+          "content": "{\n  \"message\": \"Invalid refresh token\",\n  \"extra\": null,\n  \"errors\": {\n      \"name\": \"APIError\",\n      \"message\": \"Invalid refresh token\",\n      \"status\": 401,\n      \"extra\": null\n  }\n}",
+          "type": "json"
         }
       ]
     },
@@ -80,9 +235,14 @@ define({ "api": [
     "type": "GET",
     "url": "/api/status",
     "title": "Check status of API",
-    "name": "apiName",
+    "name": "Status",
     "group": "Status",
     "version": "1.0.0",
+    "permission": [
+      {
+        "name": "public"
+      }
+    ],
     "success": {
       "fields": {
         "200": [
@@ -105,5 +265,682 @@ define({ "api": [
     },
     "filename": "src/routes/api/index.js",
     "groupTitle": "Status"
+  },
+  {
+    "type": "post",
+    "url": "/api/users",
+    "title": "Creates a new User",
+    "name": "CreateUser",
+    "group": "Users",
+    "version": "1.0.0",
+    "permission": [
+      {
+        "name": "admin"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "size": "9..12",
+            "optional": false,
+            "field": "nic",
+            "description": "<p>NIC of new user</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "size": "6..128",
+            "optional": true,
+            "field": "password",
+            "defaultValue": "nic",
+            "description": "<p>Password for new user, if not provided NIC will be used as password</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Name of the user</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "name.first",
+            "description": "<p>First name</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "name.last",
+            "description": "<p>Last name</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "allowedValues": [
+              "\"admin\"",
+              "\"nurse\"",
+              "\"doctor\""
+            ],
+            "optional": true,
+            "field": "role",
+            "defaultValue": "nurse",
+            "description": "<p>Role of the user</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "registerID",
+            "description": "<p>Registeration ID for user if avaliable</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String[]",
+            "optional": true,
+            "field": "contacts",
+            "description": "<p>Contacts of user</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "Authorization: Bearer <access-token>\n{\n  \"name\": {\n    \"first\": \"Jhone\",\n    \"last\": \"Doe\"\n  },\n  \"nic\": \"22234350279b\",\n  \"registerID\": \"someawsomeID\",\n  \"password\": \"mypassword\",\n  \"contatcs\": [\"1234567890\"],\n  \"role\": \"admin\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "200": [
+          {
+            "group": "200",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": "<p>ID for newly created user</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n    \"id\" : \"someid\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "type": "409",
+            "optional": false,
+            "field": "DuplicateNIC",
+            "description": "<p>NIC already taken</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "type": "500",
+            "optional": false,
+            "field": "ValidationErrors",
+            "description": "<p>Validation errors thrown by validator</p>"
+          }
+        ]
+      }
+    },
+    "filename": "src/routes/api/user.route.js",
+    "groupTitle": "Users"
+  },
+  {
+    "type": "delete",
+    "url": "/api/users/:id",
+    "title": "Deletes an user",
+    "name": "DeleteUser",
+    "group": "Users",
+    "version": "1.0.0",
+    "permission": [
+      {
+        "name": "admin"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": "<p>An unique ID which represents the user to be deleted</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "curl -H \"Authorization: Bearer <access-token>\" -X DELETE http://<host>:<port>/api/users/someuniqueid",
+          "type": "curl"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "200": [
+          {
+            "group": "200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "success",
+            "description": "<p>Was operation success</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n    \"success\" : true\n}",
+          "type": "type"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "type": "404",
+            "optional": false,
+            "field": "NotFound",
+            "description": "<p>Requested user not found</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "type": "500",
+            "optional": false,
+            "field": "InvalidID",
+            "description": "<p>ID is invalid</p>"
+          }
+        ]
+      }
+    },
+    "filename": "src/routes/api/user.route.js",
+    "groupTitle": "Users"
+  },
+  {
+    "type": "get",
+    "url": "/api/users/me",
+    "title": "Get current user",
+    "name": "GetCurrentUser",
+    "group": "Users",
+    "version": "1.0.0",
+    "permission": [
+      {
+        "name": "authorized"
+      }
+    ],
+    "parameter": {
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "curl -H \"Authorization: Bearer <access-token>\" http://<host>:<port>/api/users/me",
+          "type": "curl"
+        }
+      ]
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": " {\n  \"user\" :{\n    \"name\": {\n      \"first\": \"Jhone\",\n      \"last\": \"Doe\"\n    },\n    \"nic\": \"22234350279b\",\n    \"registerID\": \"someawsomeID\",\n    \"password\": \"mypassword\",\n    \"contatcs\": [\"1234567890\"],\n    \"role\": \"admin\"\n   }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/routes/api/user.route.js",
+    "groupTitle": "Users"
+  },
+  {
+    "type": "get",
+    "url": "/api/users/:id",
+    "title": "Get an user",
+    "name": "GetUser",
+    "group": "Users",
+    "version": "1.0.0",
+    "permission": [
+      {
+        "name": "authorized"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique ID that represent the user</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "curl -H \"Authorization: Bearer <access-token>\" http://<host>:<port>/api/users/someuniqueid",
+          "type": "curl"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "200": [
+          {
+            "group": "200",
+            "type": "String",
+            "optional": false,
+            "field": "nic",
+            "description": "<p>NIC of new user</p>"
+          },
+          {
+            "group": "200",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>Password for new user, if not provided NIC will be used as password</p>"
+          },
+          {
+            "group": "200",
+            "type": "Object",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Name of the user</p>"
+          },
+          {
+            "group": "200",
+            "type": "String",
+            "optional": false,
+            "field": "name.first",
+            "description": "<p>First name</p>"
+          },
+          {
+            "group": "200",
+            "type": "String",
+            "optional": false,
+            "field": "name.last",
+            "description": "<p>Last name</p>"
+          },
+          {
+            "group": "200",
+            "type": "String",
+            "optional": false,
+            "field": "role",
+            "description": "<p>Role of the user</p>"
+          },
+          {
+            "group": "200",
+            "type": "String",
+            "optional": false,
+            "field": "registerID",
+            "description": "<p>Registeration ID for user if avaliable</p>"
+          },
+          {
+            "group": "200",
+            "type": "Array",
+            "optional": false,
+            "field": "contacts",
+            "description": "<p>Contacts of user</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": " {\n  \"user\" :{\n    \"name\": {\n      \"first\": \"Jhone\",\n      \"last\": \"Doe\"\n    },\n    \"nic\": \"22234350279b\",\n    \"registerID\": \"someawsomeID\",\n    \"password\": \"mypassword\",\n    \"contatcs\": [\"1234567890\"],\n    \"role\": \"admin\"\n   }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "type": "404",
+            "optional": false,
+            "field": "NotFound",
+            "description": "<p>Requested user not found</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "type": "500",
+            "optional": false,
+            "field": "InvalidID",
+            "description": "<p>ID is invalid</p>"
+          }
+        ]
+      }
+    },
+    "filename": "src/routes/api/user.route.js",
+    "groupTitle": "Users"
+  },
+  {
+    "type": "get",
+    "url": "/api/users",
+    "title": "Index all users",
+    "name": "Index",
+    "group": "Users",
+    "version": "1.0.0",
+    "permission": [
+      {
+        "name": "authorized"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": true,
+            "field": "page",
+            "description": "<p>Page need to be shown</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": true,
+            "field": "perPage",
+            "description": "<p>Items per page</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "curl -H \"Authorization: Bearer <access-token>\" http://<host>:<port>/api/users?page=1&perPage=30",
+          "type": "curl"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "200": [
+          {
+            "group": "200",
+            "type": "Array",
+            "optional": false,
+            "field": "users",
+            "description": "<p>Array of users</p>"
+          },
+          {
+            "group": "200",
+            "type": "Number",
+            "optional": false,
+            "field": "page",
+            "description": "<p>Current page</p>"
+          },
+          {
+            "group": "200",
+            "type": "Number",
+            "optional": false,
+            "field": "perPage",
+            "description": "<p>Items per page</p>"
+          },
+          {
+            "group": "200",
+            "type": "Number",
+            "optional": false,
+            "field": "pages",
+            "description": "<p>Total number of pages</p>"
+          },
+          {
+            "group": "200",
+            "type": "Number",
+            "optional": false,
+            "field": "total",
+            "description": "<p>Total number of users</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n  \"users\": [\n      {\n          \"id\": \"5aa8ea54e8f7a98fe8c15df3\",\n          \"name\": {\n              \"first\": \"Jhon\",\n              \"last\": \"Doe\"\n          },\n          \"nic\": \"123456789v\",\n          \"createdAt\": \"2018-03-14T09:24:36.463Z\",\n          \"role\": \"admin\",\n          \"registerID\": \"someid\",\n          \"contacts\": []\n      },\n      ...\n  ],\n  \"pages\": 1,\n  \"page\": 1,\n  \"perPage\": 30,\n  \"total\": 7\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "type": "500",
+            "optional": false,
+            "field": "InvalidPage",
+            "description": "<p>Invalid Page number was given</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "type": "500",
+            "optional": false,
+            "field": "InvalidPerPage",
+            "description": "<p>Invalid Per Page number was given</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "{\n   \"message\": \"Invalid page\",\n   \"extra\": null,\n   \"errors\": {\n       \"name\": \"APIError\",\n       \"message\": \"Invalid page\",\n       \"status\": 500,\n       \"extra\": null\n   }\n }",
+          "type": "InvalidPage"
+        }
+      ]
+    },
+    "filename": "src/routes/api/user.route.js",
+    "groupTitle": "Users"
+  },
+  {
+    "type": "put",
+    "url": "/users/:id",
+    "title": "Updates a given user",
+    "name": "PutUser",
+    "group": "Users",
+    "version": "1.0.0",
+    "permission": [
+      {
+        "name": "authorized"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "size": "9..12",
+            "optional": true,
+            "field": "nic",
+            "description": "<p>NIC of new user</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "size": "6..128",
+            "optional": true,
+            "field": "password",
+            "defaultValue": "nic",
+            "description": "<p>Password for new user, if not provided NIC will be used as password</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": true,
+            "field": "name",
+            "description": "<p>Name of the user</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "name.first",
+            "description": "<p>First name</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "name.last",
+            "description": "<p>Last name</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "allowedValues": [
+              "\"admin\"",
+              "\"nurse\"",
+              "\"doctor\""
+            ],
+            "optional": true,
+            "field": "role",
+            "description": "<p>Role of the user, only admins can change this</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "registerID",
+            "description": "<p>Registeration ID for user if avaliable</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String[]",
+            "optional": true,
+            "field": "contacts",
+            "description": "<p>Contacts of user</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "Authorization: Bearer <access-token>\n{\n  \"name\": {\n    \"first\": \"Jhone new\",\n  }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "200": [
+          {
+            "group": "200",
+            "type": "String",
+            "optional": false,
+            "field": "nic",
+            "description": "<p>NIC of new user</p>"
+          },
+          {
+            "group": "200",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>Password for new user, if not provided NIC will be used as password</p>"
+          },
+          {
+            "group": "200",
+            "type": "Object",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Name of the user</p>"
+          },
+          {
+            "group": "200",
+            "type": "String",
+            "optional": false,
+            "field": "name.first",
+            "description": "<p>First name</p>"
+          },
+          {
+            "group": "200",
+            "type": "String",
+            "optional": false,
+            "field": "name.last",
+            "description": "<p>Last name</p>"
+          },
+          {
+            "group": "200",
+            "type": "String",
+            "optional": false,
+            "field": "role",
+            "description": "<p>Role of the user</p>"
+          },
+          {
+            "group": "200",
+            "type": "String",
+            "optional": false,
+            "field": "registerID",
+            "description": "<p>Registeration ID for user if avaliable</p>"
+          },
+          {
+            "group": "200",
+            "type": "Array",
+            "optional": false,
+            "field": "contacts",
+            "description": "<p>Contacts of user</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n  \"name\": {\n    \"first\": \"Jhone new\",\n    \"last\": \"Doe\"\n  },\n  \"nic\": \"22234350279b\",\n  \"registerID\": \"someawsomeID\",\n  \"password\": \"mypassword\",\n  \"contatcs\": [\"1234567890\"],\n  \"role\": \"admin\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "type": "404",
+            "optional": false,
+            "field": "NotFound",
+            "description": "<p>Requested user not found</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "type": "500",
+            "optional": false,
+            "field": "InvalidID",
+            "description": "<p>ID is invalid</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "type": "500",
+            "optional": false,
+            "field": "ValidationError",
+            "description": "<p>Validation errors</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "type": "409",
+            "optional": false,
+            "field": "DuplicateNIC",
+            "description": "<p>Nic is already taken</p>"
+          }
+        ]
+      }
+    },
+    "filename": "src/routes/api/user.route.js",
+    "groupTitle": "Users"
   }
 ] });

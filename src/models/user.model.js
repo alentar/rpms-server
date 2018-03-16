@@ -3,6 +3,9 @@ const mongoose = require('mongoose')
 const bcrypt = require('bcrypt-nodejs')
 const httpStatus = require('http-status')
 const APIError = require('../utils/APIError')
+const config = require('../config')
+const jwt = require('jsonwebtoken')
+const moment = require('moment')
 const Schema = mongoose.Schema
 
 const roles = [ 'nurse', 'doctor', 'admin' ]
@@ -23,9 +26,22 @@ const userSchema = new Schema({
     maxlength: 128
   },
   name: {
-    type: String,
-    maxlength: 50
+    first: {
+      type: String,
+      required: true,
+      maxlength: 25
+    },
+    last: {
+      type: String,
+      required: true,
+      maxlength: 25
+    }
   },
+  registerID: {
+    type: String,
+    default: ''
+  },
+  contacts: [{type: String}],
   role: {
     type: String,
     default: 'nurse',
@@ -52,7 +68,7 @@ userSchema.pre('save', async function save (next) {
 userSchema.method({
   transform () {
     const transformed = {}
-    const fields = ['id', 'name', 'nic', 'createdAt', 'role']
+    const fields = ['id', 'name', 'nic', 'createdAt', 'role', 'registerID', 'contacts']
 
     fields.forEach((field) => {
       transformed[field] = this[field]
@@ -63,6 +79,16 @@ userSchema.method({
 
   passwordMatches (password) {
     return bcrypt.compareSync(password, this.password)
+  },
+
+  token () {
+    const payload = {
+      exp: moment().add(config.tokenExpiration, 'hours').unix(),
+      iat: moment().unix(),
+      sub: this._id
+    }
+
+    return jwt.sign(payload, config.secret)
   }
 })
 
@@ -85,7 +111,17 @@ userSchema.statics = {
   },
 
   async findAndGenerateToken (payload) {
-    const { nic, password } = payload
+    const { nic, password, refreshObject } = payload
+
+    // lets issue token if refreshObject is present
+    if (refreshObject) {
+      const user = await User.findOne({userID: refreshObject.userID})
+
+      if (!user) throw new APIError(`Invalid token`, httpStatus.UNAUTHORIZED)
+
+      return { user: user, accessToken: user.token() }
+    }
+
     if (!nic) throw new APIError('Nic must be provided for login')
 
     const user = await this.findOne({ nic }).exec()
@@ -95,8 +131,30 @@ userSchema.statics = {
 
     if (!passwordOK) throw new APIError(`Password mismatch`, httpStatus.UNAUTHORIZED)
 
-    return user
+    return { user: user, accessToken: user.token() }
+  },
+
+  async list ({page = 1, perPage = 30}) {
+    page = Number(page)
+    perPage = Number(perPage)
+
+    if (!page || page <= 0) throw new APIError('Invalid page')
+    if (!perPage || perPage <= 0) throw new APIError('Invalid perPage')
+
+    const results = await User.find()
+      .limit(perPage)
+      .skip(perPage * (page - 1))
+      .sort({'createdAt': -1})
+
+    const users = results.map((result) => result.transform())
+    const total = await User.count()
+    const pages = Math.ceil(total / perPage)
+
+    return {users, pages, page, perPage, total}
   }
 }
 
-module.exports = mongoose.model('User', userSchema)
+exports.roles = roles
+
+const User = mongoose.model('User', userSchema)
+module.exports = User
