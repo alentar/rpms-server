@@ -14,7 +14,7 @@ exports.create = async (req, res, next) => {
     const savedUser = await user.save()
     res.status(httpStatus.CREATED)
     res.send({
-      id: savedUser._id
+      user: savedUser.transform()
     })
   } catch (error) {
     return next(User.checkDuplicateNicError(error))

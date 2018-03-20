@@ -34,6 +34,24 @@ const questions = [
   },
   {
     type: 'list',
+    name: 'gender',
+    message: 'Select your gender?',
+    choices: [ 'Male', 'Female' ],
+    filter: function (val) {
+      return val.toLowerCase()
+    }
+  },
+  {
+    type: 'list',
+    name: 'title',
+    message: 'Select your title?',
+    choices: [ 'Mr', 'Mrs', 'Miss', 'Ms' ],
+    filter: function (val) {
+      return val.toLowerCase()
+    }
+  },
+  {
+    type: 'list',
     name: 'role',
     message: 'Select your role?',
     choices: ['Admin', 'Doctor', 'Nurse'],
@@ -80,27 +98,12 @@ program
           last: ans.lastname
         },
         password: ans.password,
-        role: ans.role
+        role: ans.role,
+        title: ans.title,
+        gender: ans.gender
       }
       createUser(schema)
     })
-  })
-
-program
-  .command('create <role> <nic> <firstame> <lastname> <password>')
-  .alias('c')
-  .description('Create an user')
-  .action((role, nic, firstname, lastname, password) => {
-    const schema = {
-      nic: nic,
-      name: {
-        first: firstname,
-        last: lastname
-      },
-      password: password,
-      role: role
-    }
-    createUser(schema)
   })
 
 program.parse(process.argv)

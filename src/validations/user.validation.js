@@ -1,7 +1,10 @@
 'use strict'
 
 const Joi = require('joi')
-const userRoles = require('../models/user.model').roles
+const User = require('../models/user.model')
+const roles = User.roles
+const titles = User.titles
+const genders = User.genders
 
 // User validation rules
 module.exports = {
@@ -14,8 +17,10 @@ module.exports = {
         last: Joi.string().required()
       }),
       registerID: Joi.string().optional(),
-      role: Joi.string().valid(userRoles).optional(),
-      contacts: Joi.array().items(Joi.string().min(10).max(13)).optional()
+      role: Joi.string().valid(roles).optional(),
+      contacts: Joi.array().items(Joi.string().min(10).max(13)).optional(),
+      gender: Joi.string().valid(genders).required(),
+      title: Joi.string().valid(titles).required()
     }
   },
 
@@ -28,8 +33,10 @@ module.exports = {
         last: Joi.string().optional()
       }),
       registerID: Joi.string().optional(),
-      role: Joi.string().valid(userRoles).optional(),
-      contacts: Joi.array().items(Joi.string().min(10).max(13)).optional()
+      role: Joi.string().valid(roles).optional(),
+      contacts: Joi.array().items(Joi.string().min(10).max(13)).optional(),
+      gender: Joi.string().valid(genders).optional(),
+      title: Joi.string().valid(titles).optional()
     }
   }
 }
