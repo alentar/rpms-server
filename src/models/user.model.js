@@ -18,14 +18,14 @@ const userSchema = new Schema({
     required: true,
     unique: true,
     lowercase: true,
-    minlength: 9,
+    minlength: 10,
     maxlength: 12
   },
   password: {
     type: String,
     required: true,
     minlength: 4,
-    maxlength: 128
+    maxlength: 20
   },
   name: {
     type: String,
