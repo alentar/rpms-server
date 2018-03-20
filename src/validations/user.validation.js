@@ -11,7 +11,7 @@ module.exports = {
   create: {
     body: {
       nic: Joi.string().min(10).max(12).required(),
-      password: Joi.string().min(6).max(20).optional(),
+      password: Joi.string().min(6).max(50).optional(),
       name: Joi.string().max(150).required(),
       registerID: Joi.string().optional(),
       role: Joi.string().valid(roles).optional(),
@@ -24,7 +24,7 @@ module.exports = {
   update: {
     body: {
       nic: Joi.string().min(10).max(12).optional(),
-      password: Joi.string().min(6).max(20).optional(),
+      password: Joi.string().min(6).max(50).optional(),
       name: Joi.string().max(150).required(),
       registerID: Joi.string().optional(),
       role: Joi.string().valid(roles).optional(),
