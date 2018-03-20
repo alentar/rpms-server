@@ -28,16 +28,9 @@ const userSchema = new Schema({
     maxlength: 128
   },
   name: {
-    first: {
-      type: String,
-      required: true,
-      maxlength: 25
-    },
-    last: {
-      type: String,
-      required: true,
-      maxlength: 25
-    }
+    type: String,
+    required: true,
+    maxlength: 150
   },
   registerID: {
     type: String,
