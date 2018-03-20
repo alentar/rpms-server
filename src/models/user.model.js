@@ -9,6 +9,8 @@ const moment = require('moment')
 const Schema = mongoose.Schema
 
 const roles = [ 'nurse', 'doctor', 'admin' ]
+const genders = [ 'male', 'female' ]
+const titles = [ 'mr', 'mrs', 'miss', 'ms' ]
 
 const userSchema = new Schema({
   nic: {
@@ -42,6 +44,16 @@ const userSchema = new Schema({
     default: ''
   },
   contacts: [{type: String}],
+  gender: {
+    type: String,
+    enum: genders,
+    required: true
+  },
+  title: {
+    type: String,
+    enum: titles,
+    required: true
+  },
   role: {
     type: String,
     default: 'nurse',
@@ -68,7 +80,7 @@ userSchema.pre('save', async function save (next) {
 userSchema.method({
   transform () {
     const transformed = {}
-    const fields = ['id', 'name', 'nic', 'createdAt', 'role', 'registerID', 'contacts']
+    const fields = ['id', 'name', 'nic', 'createdAt', 'role', 'registerID', 'contacts', 'gender', 'title']
 
     fields.forEach((field) => {
       transformed[field] = this[field]
@@ -94,6 +106,10 @@ userSchema.method({
 
 userSchema.statics = {
   roles,
+
+  genders,
+
+  titles,
 
   checkDuplicateNicError (err) {
     if (err.code === 11000) {
@@ -153,8 +169,6 @@ userSchema.statics = {
     return {users, pages, page, perPage, total}
   }
 }
-
-exports.roles = roles
 
 const User = mongoose.model('User', userSchema)
 module.exports = User
