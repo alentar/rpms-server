@@ -19,13 +19,8 @@ const questions = [
   },
   {
     type: 'input',
-    name: 'firstname',
-    message: 'Enter your firstname ...'
-  },
-  {
-    type: 'input',
-    name: 'lastname',
-    message: 'Enter your lastname ...'
+    name: 'name',
+    message: 'Enter your fullname ...'
   },
   {
     type: 'password',
@@ -93,10 +88,7 @@ program
     inquirer.prompt(questions).then((ans) => {
       const schema = {
         nic: ans.nic,
-        name: {
-          first: ans.firstname,
-          last: ans.lastname
-        },
+        name: ans.name,
         password: ans.password,
         role: ans.role,
         title: ans.title,

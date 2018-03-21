@@ -18,26 +18,19 @@ const userSchema = new Schema({
     required: true,
     unique: true,
     lowercase: true,
-    minlength: 9,
+    minlength: 10,
     maxlength: 12
   },
   password: {
     type: String,
     required: true,
-    minlength: 4,
-    maxlength: 128
+    minlength: 6,
+    maxlength: 50
   },
   name: {
-    first: {
-      type: String,
-      required: true,
-      maxlength: 25
-    },
-    last: {
-      type: String,
-      required: true,
-      maxlength: 25
-    }
+    type: String,
+    required: true,
+    maxlength: 150
   },
   registerID: {
     type: String,
@@ -56,7 +49,7 @@ const userSchema = new Schema({
   },
   role: {
     type: String,
-    default: 'nurse',
+    default: 'admin',
     enum: roles
   }
 }, {
