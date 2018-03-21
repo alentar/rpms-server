@@ -148,12 +148,17 @@ userSchema.statics = {
     perPage = Number(perPage)
 
     if (!page || page <= 0) throw new APIError('Invalid page')
-    if (!perPage || perPage <= 0) throw new APIError('Invalid perPage')
+    if (!perPage || (perPage <= 0 && perPage !== -1)) throw new APIError('Invalid perPage')
 
-    const results = await User.find()
-      .limit(perPage)
-      .skip(perPage * (page - 1))
-      .sort({'createdAt': -1})
+    let results = null
+    if (perPage === -1) {
+      results = await User.find().sort({'createdAt': -1})
+    } else {
+      results = await User.find()
+        .limit(perPage)
+        .skip(perPage * (page - 1))
+        .sort({'createdAt': -1})
+    }
 
     const users = results.map((result) => result.transform())
     const total = await User.count()
