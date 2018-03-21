@@ -25,7 +25,7 @@ module.exports = {
     body: {
       nic: Joi.string().min(10).max(12).optional(),
       password: Joi.string().min(6).max(50).optional(),
-      name: Joi.string().max(150).required(),
+      name: Joi.string().max(150).optional(),
       registerID: Joi.string().optional(),
       role: Joi.string().valid(roles).optional(),
       contacts: Joi.array().items(Joi.string().min(10).max(13)).optional(),
