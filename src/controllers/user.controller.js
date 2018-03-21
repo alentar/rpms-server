@@ -5,6 +5,7 @@ const httpStatus = require('http-status')
 const APIError = require('../utils/APIError')
 const ObjectId = require('mongoose').Types.ObjectId
 const { omit, compact } = require('lodash')
+const bcrypt = require('bcrypt-nodejs')
 
 exports.create = async (req, res, next) => {
   try {
@@ -56,6 +57,11 @@ exports.update = async (req, res, next) => {
     const omitRole = req.user.role !== 'admin' ? 'role' : ''
     const omitPassword = (req.user.role === 'admin' && req.user.id !== req.params.userID) ? '' : 'password'
     const userObj = omit(req.body, compact([omitRole, 'id', '_id', omitPassword]))
+
+    if (userObj.password) {
+      userObj.password = bcrypt.hashSync(userObj.password)
+    }
+
     const user = await User.findByIdAndUpdate(req.params.userID, userObj, {new: true})
     return res.json({user: user.transform()})
   } catch (error) {

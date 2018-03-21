@@ -62,7 +62,7 @@ userSchema.pre('save', async function save (next) {
       return next()
     }
 
-    this.password = bcrypt.hashSync(this.password)
+    this.password = bcrypt.hashSync(this.password) // replace with async version
 
     return next()
   } catch (error) {
