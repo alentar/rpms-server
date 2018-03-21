@@ -54,7 +54,8 @@ exports.update = async (req, res, next) => {
     if (!ObjectId.isValid(req.params.userID)) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
 
     const omitRole = req.user.role !== 'admin' ? 'role' : ''
-    const userObj = omit(req.body, compact([omitRole, 'id', '_id', 'password']))
+    const omitPassword = (req.user.role === 'admin' && req.user.id !== req.params.userID) ? '' : 'password'
+    const userObj = omit(req.body, compact([omitRole, 'id', '_id', omitPassword]))
     const user = await User.findByIdAndUpdate(req.params.userID, userObj, {new: true})
     return res.json({user: user.transform()})
   } catch (error) {
