@@ -10,11 +10,13 @@ const bcrypt = require('bcrypt-nodejs')
 
 
 exports.create = async (req, res, next) => {
-  try {req.body.name=req.body.name.split(' ').map((word) => {return word[0].toUpperCase()+word.substr(1).toLowerCase() }).join(' ')
-    if (!req.body.password) req.body.password = req.body.nic
-
-    const name=req.body.name
+ 
+    try{
+      
+    req.body.name=req.body.name.split(' ').map((word) => {return word[0].toUpperCase()+word.substr(1).toLowerCase() }).join(' ')
     
+    if (!req.body.password) req.body.password = req.body.nic
+   
     const user = new User(req.body)
 
     const savedUser = await user.save()
