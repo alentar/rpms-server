@@ -8,10 +8,15 @@ const { omit, compact } = require('lodash')
 const bcrypt = require('bcrypt-nodejs')
 
 exports.create = async (req, res, next) => {
-  try {
+ 
+    try{
+      if (!req.body.password) req.body.name = req.body.name.split(' ').map((word) => {
+        return word[0].toUpperCase()+word.substr(1).toLowerCase() }).join(' ')
+    
     if (!req.body.password) req.body.password = req.body.nic
-
+   
     const user = new User(req.body)
+
     const savedUser = await user.save()
     res.status(httpStatus.CREATED)
     res.send({
@@ -21,6 +26,7 @@ exports.create = async (req, res, next) => {
     return next(User.checkDuplicateNicError(error))
   }
 }
+
 
 exports.view = async (req, res, next) => {
   try {
@@ -62,9 +68,10 @@ exports.update = async (req, res, next) => {
       userObj.password = bcrypt.hashSync(userObj.password)
     }
 
-    if(req.body.name!==undefined&&req.body.name!==null){
-      req.body.name=req.body.name.split(' ').map((word) => {
+    if(req.body.name !== undefined && req.body.name !== null){
+      req.body.name = req.body.name.split(' ').map((word) => {
         return word[0].toUpperCase()+word.substr(1).toLowerCase() }).join(' ')
+  
     }
     
     const user = await User.findByIdAndUpdate(req.params.userID, userObj, {new: true})
