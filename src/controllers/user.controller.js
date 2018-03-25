@@ -14,7 +14,6 @@ exports.create = async (req, res, next) => {
     } 
     if (!req.body.password) req.body.password = req.body.nic
     const user = new User(req.body)
-
     const savedUser = await user.save()
     res.status(httpStatus.CREATED)
     res.send({
