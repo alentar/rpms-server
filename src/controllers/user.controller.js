@@ -10,8 +10,10 @@ const bcrypt = require('bcrypt-nodejs')
 exports.create = async (req, res, next) => {
  
     try{
-      if (req.body.name) req.body.name = req.body.name.split(' ').map((word) => {
+      if (req.body.name){
+        req.body.name = req.body.name.split(' ').map((word) => {
         return word[0].toUpperCase()+word.substr(1).toLowerCase() }).join(' ')
+      }
     
     if (!req.body.password) req.body.password = req.body.nic
    
