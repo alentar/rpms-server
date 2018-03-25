@@ -6,6 +6,14 @@ node_js:
 services:
   - mongodb
 
+before_script:
+  - yarn add global gulp
+
+script:
+  - gulp lint
+  - gulp test
+
 cache:
+  yarn: true
   directories:
     - node_modules
