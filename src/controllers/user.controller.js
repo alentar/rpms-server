@@ -10,7 +10,7 @@ const bcrypt = require('bcrypt-nodejs')
 exports.create = async (req, res, next) => {
  
     try{
-      if (!req.body.password) req.body.name = req.body.name.split(' ').map((word) => {
+      if (req.body.name) req.body.name = req.body.name.split(' ').map((word) => {
         return word[0].toUpperCase()+word.substr(1).toLowerCase() }).join(' ')
     
     if (!req.body.password) req.body.password = req.body.nic
@@ -68,12 +68,9 @@ exports.update = async (req, res, next) => {
       userObj.password = bcrypt.hashSync(userObj.password)
     }
 
-    if(req.body.name !== undefined && req.body.name !== null){
-      req.body.name = req.body.name.split(' ').map((word) => {
-        return word[0].toUpperCase()+word.substr(1).toLowerCase() }).join(' ')
-  
-    }
-    
+    if(req.body.name){
+      req.body.name = req.body.name.split(' ').map((word) => {return word[0].toUpperCase()+word.substr(1).toLowerCase() }).join(' ')
+    } 
     const user = await User.findByIdAndUpdate(req.params.userID, userObj, {new: true})
     return res.json({user: user.transform()})
   } catch (error) {
