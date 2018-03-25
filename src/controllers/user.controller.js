@@ -15,7 +15,6 @@ exports.create = async (req, res, next) => {
       }
     
     if (!req.body.password) req.body.password = req.body.nic
-   
     const user = new User(req.body)
 
     const savedUser = await user.save()
@@ -27,7 +26,6 @@ exports.create = async (req, res, next) => {
     return next(User.checkDuplicateNicError(error))
   }
 }
-
 
 exports.view = async (req, res, next) => {
   try {
