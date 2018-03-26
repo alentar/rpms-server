@@ -2,6 +2,7 @@
 
 const mongoose = require('mongoose')
 const httpStatus = require('http-status')
+const APIError = require('../utils/APIError')
 
 const deviceSchema = new mongoose.Schema({
   name: {
@@ -17,11 +18,11 @@ const deviceSchema = new mongoose.Schema({
     unique: true
   },
 
-  chipID: {
+  chipId: {
     type: String
   },
 
-  authenticated: {
+  authorized: {
     type: Boolean,
     default: false
   },
@@ -48,6 +49,13 @@ deviceSchema.statics = {
     }
 
     return err
+  },
+
+  async checkDeviceAssigned (deviceId) {
+    const device = await Device.findById(deviceId)
+    if (!device) throw new APIError('Device not found', httpStatus.NOT_FOUND)
+    if (device.authorized === false) throw new APIError('Unauthorized device')
+    if (device.assigned === true) throw new APIError('Device already assigned for a bed')
   }
 }
 
