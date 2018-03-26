@@ -3,9 +3,9 @@
 const express = require('express')
 const router = express.Router()
 const validator = require('express-validation')
-const { create, update } = require('../../validations/user.validation')
-const userController = require('../../controllers/user.controller')
-const auth = require('../../middlewares/authorization')
+const { create, update } = require('../../../validations/user.validation')
+const userController = require('../../../controllers/user.controller')
+const auth = require('../../../middlewares/authorization')
 
 /**
  *
