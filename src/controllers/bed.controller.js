@@ -3,7 +3,6 @@ const Device = require('../models/device.model')
 const httpStatus = require('http-status')
 const APIError = require('../utils/APIError')
 const ObjectId = require('mongoose').Types.ObjectId
-// const _ = require('lodash')
 
 exports.create = async (req, res, next) => {
   try {
