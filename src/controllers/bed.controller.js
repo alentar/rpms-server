@@ -94,7 +94,7 @@ exports.update = async (req, res, next) => {
     const ward = await Ward.findById(req.params.wardId).where('beds._id').equals(req.params.bedId)
 
     console.log(ward)
-    if (!ward) throw new APIError('Invalid bed', httpStatus.INTERNAL_SERVER_ERROR)
+    if (!ward) throw new APIError('Invalid beds', httpStatus.INTERNAL_SERVER_ERROR)
 
     if (newBed.number) {
       ward.beds.forEach(bed => {
