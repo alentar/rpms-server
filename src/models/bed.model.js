@@ -10,7 +10,7 @@ const bedSchema = new mongoose.Schema({
     sparse: true
   },
 
-  deviceID: {
+  deviceId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Device'
   }
