@@ -55,7 +55,7 @@ deviceSchema.statics = {
     const device = await Device.findById(deviceId)
     if (!device) throw new APIError('Device not found', httpStatus.NOT_FOUND)
     if (device.authorized === false) throw new APIError('Unauthorized device')
-    if (device.assigned === true) throw new APIError('Device already assigned for a bed')
+    if (device.assigned === true) throw new APIError('Device already assigned for a beds')
   }
 }
 
