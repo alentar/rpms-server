@@ -1,9 +1,9 @@
 'use strict'
 const express = require('express')
 const router = express.Router()
-const authRouter = require('./auth.route')
-const userRouter = require('./user.route')
-const wardRouter = require('./ward.route')
+const authRouter = require('./auth')
+const userRouter = require('./user')
+const wardRouter = require('./ward')
 
 /**
  *
