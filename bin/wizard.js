@@ -19,18 +19,31 @@ const questions = [
   },
   {
     type: 'input',
-    name: 'firstname',
-    message: 'Enter your firstname ...'
-  },
-  {
-    type: 'input',
-    name: 'lastname',
-    message: 'Enter your lastname ...'
+    name: 'name',
+    message: 'Enter your fullname ...'
   },
   {
     type: 'password',
     name: 'password',
     message: 'Enter a strong password...'
+  },
+  {
+    type: 'list',
+    name: 'gender',
+    message: 'Select your gender?',
+    choices: [ 'Male', 'Female' ],
+    filter: function (val) {
+      return val.toLowerCase()
+    }
+  },
+  {
+    type: 'list',
+    name: 'title',
+    message: 'Select your title?',
+    choices: [ 'Mr', 'Mrs', 'Miss', 'Ms' ],
+    filter: function (val) {
+      return val.toLowerCase()
+    }
   },
   {
     type: 'list',
@@ -75,32 +88,14 @@ program
     inquirer.prompt(questions).then((ans) => {
       const schema = {
         nic: ans.nic,
-        name: {
-          first: ans.firstname,
-          last: ans.lastname
-        },
+        name: ans.name,
         password: ans.password,
-        role: ans.role
+        role: ans.role,
+        title: ans.title,
+        gender: ans.gender
       }
       createUser(schema)
     })
-  })
-
-program
-  .command('create <role> <nic> <firstame> <lastname> <password>')
-  .alias('c')
-  .description('Create an user')
-  .action((role, nic, firstname, lastname, password) => {
-    const schema = {
-      nic: nic,
-      name: {
-        first: firstname,
-        last: lastname
-      },
-      password: password,
-      role: role
-    }
-    createUser(schema)
   })
 
 program.parse(process.argv)

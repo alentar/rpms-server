@@ -9,6 +9,8 @@ const moment = require('moment')
 const Schema = mongoose.Schema
 
 const roles = [ 'nurse', 'doctor', 'admin' ]
+const genders = [ 'male', 'female' ]
+const titles = [ 'mr', 'mrs', 'miss', 'ms' ]
 
 const userSchema = new Schema({
   nic: {
@@ -16,35 +18,38 @@ const userSchema = new Schema({
     required: true,
     unique: true,
     lowercase: true,
-    minlength: 9,
+    minlength: 10,
     maxlength: 12
   },
   password: {
     type: String,
     required: true,
-    minlength: 4,
-    maxlength: 128
+    minlength: 6,
+    maxlength: 50
   },
   name: {
-    first: {
-      type: String,
-      required: true,
-      maxlength: 25
-    },
-    last: {
-      type: String,
-      required: true,
-      maxlength: 25
-    }
+    type: String,
+    required: true,
+    maxlength: 150
   },
   registerID: {
     type: String,
     default: ''
   },
   contacts: [{type: String}],
+  gender: {
+    type: String,
+    enum: genders,
+    required: true
+  },
+  title: {
+    type: String,
+    enum: titles,
+    required: true
+  },
   role: {
     type: String,
-    default: 'nurse',
+    default: 'admin',
     enum: roles
   }
 }, {
@@ -57,7 +62,7 @@ userSchema.pre('save', async function save (next) {
       return next()
     }
 
-    this.password = bcrypt.hashSync(this.password)
+    this.password = bcrypt.hashSync(this.password) // replace with async version
 
     return next()
   } catch (error) {
@@ -68,7 +73,7 @@ userSchema.pre('save', async function save (next) {
 userSchema.method({
   transform () {
     const transformed = {}
-    const fields = ['id', 'name', 'nic', 'createdAt', 'role', 'registerID', 'contacts']
+    const fields = ['id', 'name', 'nic', 'createdAt', 'role', 'registerID', 'contacts', 'gender', 'title']
 
     fields.forEach((field) => {
       transformed[field] = this[field]
@@ -94,6 +99,10 @@ userSchema.method({
 
 userSchema.statics = {
   roles,
+
+  genders,
+
+  titles,
 
   checkDuplicateNicError (err) {
     if (err.code === 11000) {
@@ -139,12 +148,17 @@ userSchema.statics = {
     perPage = Number(perPage)
 
     if (!page || page <= 0) throw new APIError('Invalid page')
-    if (!perPage || perPage <= 0) throw new APIError('Invalid perPage')
+    if (!perPage || (perPage <= 0 && perPage !== -1)) throw new APIError('Invalid perPage')
 
-    const results = await User.find()
-      .limit(perPage)
-      .skip(perPage * (page - 1))
-      .sort({'createdAt': -1})
+    let results = null
+    if (perPage === -1) {
+      results = await User.find().sort({'createdAt': -1})
+    } else {
+      results = await User.find()
+        .limit(perPage)
+        .skip(perPage * (page - 1))
+        .sort({'createdAt': -1})
+    }
 
     const users = results.map((result) => result.transform())
     const total = await User.count()
@@ -153,8 +167,6 @@ userSchema.statics = {
     return {users, pages, page, perPage, total}
   }
 }
-
-exports.roles = roles
 
 const User = mongoose.model('User', userSchema)
 module.exports = User

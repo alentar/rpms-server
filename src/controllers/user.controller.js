@@ -5,16 +5,19 @@ const httpStatus = require('http-status')
 const APIError = require('../utils/APIError')
 const ObjectId = require('mongoose').Types.ObjectId
 const { omit, compact } = require('lodash')
+const bcrypt = require('bcrypt-nodejs')
 
 exports.create = async (req, res, next) => {
   try {
+    if (req.body.name) {
+      req.body.name = req.body.name.split(' ').map((word) => { return word[0].toUpperCase() + word.substr(1).toLowerCase() }).join(' ')
+    }
     if (!req.body.password) req.body.password = req.body.nic
-
     const user = new User(req.body)
     const savedUser = await user.save()
     res.status(httpStatus.CREATED)
     res.send({
-      id: savedUser._id
+      user: savedUser.transform()
     })
   } catch (error) {
     return next(User.checkDuplicateNicError(error))
@@ -54,7 +57,17 @@ exports.update = async (req, res, next) => {
     if (!ObjectId.isValid(req.params.userID)) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
 
     const omitRole = req.user.role !== 'admin' ? 'role' : ''
-    const userObj = omit(req.body, compact([omitRole, 'id', '_id', 'password']))
+    const omitPassword = (req.user.role === 'admin' && req.user.id !== req.params.userID) ? '' : 'password'
+    const userObj = omit(req.body, compact([omitRole, 'id', '_id', omitPassword]))
+
+    if (userObj.password) {
+      userObj.password = bcrypt.hashSync(userObj.password)
+    }
+
+    if (userObj.name) {
+      userObj.name = userObj.name.split(' ').map((word) => { return word[0].toUpperCase() + word.substr(1).toLowerCase() }).join(' ')
+    }
+
     const user = await User.findByIdAndUpdate(req.params.userID, userObj, {new: true})
     return res.json({user: user.transform()})
   } catch (error) {

@@ -125,7 +125,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "src/routes/api/auth.route.js",
+    "filename": "src/routes/api/auth/index.js",
     "groupTitle": "Authentication"
   },
   {
@@ -228,7 +228,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "src/routes/api/auth.route.js",
+    "filename": "src/routes/api/auth/index.js",
     "groupTitle": "Authentication"
   },
   {
@@ -396,7 +396,7 @@ define({ "api": [
         ]
       }
     },
-    "filename": "src/routes/api/user.route.js",
+    "filename": "src/routes/api/user/index.js",
     "groupTitle": "Users"
   },
   {
@@ -471,7 +471,7 @@ define({ "api": [
         ]
       }
     },
-    "filename": "src/routes/api/user.route.js",
+    "filename": "src/routes/api/user/index.js",
     "groupTitle": "Users"
   },
   {
@@ -504,7 +504,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "src/routes/api/user.route.js",
+    "filename": "src/routes/api/user/index.js",
     "groupTitle": "Users"
   },
   {
@@ -628,7 +628,7 @@ define({ "api": [
         ]
       }
     },
-    "filename": "src/routes/api/user.route.js",
+    "filename": "src/routes/api/user/index.js",
     "groupTitle": "Users"
   },
   {
@@ -745,7 +745,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "src/routes/api/user.route.js",
+    "filename": "src/routes/api/user/index.js",
     "groupTitle": "Users"
   },
   {
@@ -940,7 +940,7 @@ define({ "api": [
         ]
       }
     },
-    "filename": "src/routes/api/user.route.js",
+    "filename": "src/routes/api/user/index.js",
     "groupTitle": "Users"
   }
 ] });
