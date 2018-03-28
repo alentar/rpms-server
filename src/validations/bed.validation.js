@@ -15,5 +15,12 @@ module.exports = {
       number: Joi.number().optional().positive(),
       deviceId: Joi.string().optional()
     }
+  },
+
+  bulkCreate: {
+    body: {
+      start: Joi.number().positive().min(1).required(),
+      end: Joi.number().positive().min(Joi.ref('start')).required()
+    }
   }
 }

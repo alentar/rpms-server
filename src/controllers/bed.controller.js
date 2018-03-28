@@ -41,6 +41,36 @@ exports.create = async (req, res, next) => {
   }
 }
 
+exports.bulkCreate = async (req, res, next) => {
+  try {
+    if (!ObjectId.isValid(req.params.wardId)) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
+
+    const ward = await Ward.findById(req.params.wardId)
+    if (!ward) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
+
+    let excludes = []
+    const start = req.body.start
+    const end = req.body.end
+
+    ward.beds.forEach(bed => {
+      if (bed.number >= start && bed.number <= end) excludes.push(bed.number)
+    })
+
+    console.log(excludes)
+
+    for (let index = start; index <= end; index++) {
+      if (excludes.includes(index)) continue
+
+      ward.beds.push({ number: index })
+    }
+
+    const savedWard = await ward.save()
+    return res.json({ward: savedWard})
+  } catch (error) {
+    return next(error)
+  }
+}
+
 exports.delete = async (req, res, next) => {
   try {
     if (!ObjectId.isValid(req.params.wardId) || !ObjectId.isValid(req.params.bedId)) {
