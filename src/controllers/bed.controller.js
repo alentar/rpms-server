@@ -56,8 +56,6 @@ exports.bulkCreate = async (req, res, next) => {
       if (bed.number >= start && bed.number <= end) excludes.push(bed.number)
     })
 
-    console.log(excludes)
-
     for (let index = start; index <= end; index++) {
       if (excludes.includes(index)) continue
 
