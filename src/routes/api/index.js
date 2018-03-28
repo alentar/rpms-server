@@ -4,6 +4,7 @@ const router = express.Router()
 const authRouter = require('./auth')
 const userRouter = require('./user')
 const wardRouter = require('./ward')
+const deviceRouter = require('./device')
 
 /**
  *
@@ -26,5 +27,6 @@ router.get('/status', (req, res) => { res.send({status: 'OK'}) }) // api status
 router.use('/auth', authRouter) // mount auth routes
 router.use('/users', userRouter) // mount user routes
 router.use('/wards', wardRouter) // mount ward routes
+router.use('/devices', deviceRouter) // mount device routes
 
 module.exports = router

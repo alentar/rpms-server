@@ -143,25 +143,34 @@ userSchema.statics = {
     return { user: user, accessToken: user.token() }
   },
 
-  async list ({page = 1, perPage = 30}) {
+  async list ({ page = 1, perPage = 30, sortBy = 'createdAt', role = 'all', order = 'desc' }) {
     page = Number(page)
     perPage = Number(perPage)
 
     if (!page || page <= 0) throw new APIError('Invalid page')
     if (!perPage || (perPage <= 0 && perPage !== -1)) throw new APIError('Invalid perPage')
+    order = (order === 'asc' ? 1 : -1)
+
+    const fields = ['name', 'nic', 'createdAt', 'role', 'registerID', 'contacts', 'gender', 'title']
+    sortBy = !fields.includes(sortBy) ? 'createdAt' : sortBy
+    const sorter = {}
+    sorter[sortBy] = order
+
+    const find = {}
+    if (User.roles.includes(role)) find['role'] = role
 
     let results = null
     if (perPage === -1) {
-      results = await User.find().sort({'createdAt': -1})
+      results = await User.find(find).sort(sorter)
     } else {
-      results = await User.find()
+      results = await User.find(find)
         .limit(perPage)
         .skip(perPage * (page - 1))
-        .sort({'createdAt': -1})
+        .sort(sorter)
     }
 
     const users = results.map((result) => result.transform())
-    const total = await User.count()
+    const total = await User.find(find).count()
     const pages = Math.ceil(total / perPage)
 
     return {users, pages, page, perPage, total}

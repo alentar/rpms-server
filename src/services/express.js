@@ -24,6 +24,7 @@ passport.use('jwt', passportJwt.jwt)
 
 app.use('/api', apiRouter)
 app.use(errorHandler.handleNotFound)
+app.use(errorHandler.handleDeviceError)
 app.use(errorHandler.handleError)
 
 exports.start = () => {

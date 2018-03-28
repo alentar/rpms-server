@@ -1,3 +1,5 @@
+'use strict'
+
 const Ward = require('../models/ward.model')
 const Device = require('../models/device.model')
 const httpStatus = require('http-status')
@@ -6,11 +8,14 @@ const ObjectId = require('mongoose').Types.ObjectId
 
 exports.create = async (req, res, next) => {
   try {
-    const newBed = req.body.bed
+    const newBed = req.body
     if (!ObjectId.isValid(req.params.wardId)) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
     if (newBed.deviceId && !ObjectId.isValid(newBed.deviceId)) throw new APIError('Invalid device ID', httpStatus.INTERNAL_SERVER_ERROR)
 
     const ward = await Ward.findById(req.params.wardId)
+
+    if (!ward) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
+
     ward.beds.forEach(bed => {
       if (bed.number === newBed.number) {
         const error = new APIError('Bed number already exists')
@@ -42,8 +47,9 @@ exports.delete = async (req, res, next) => {
       throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
     }
 
-    // const ward = await Ward.findByIdAndUpdate(req.params.wardId, { $pull: { beds: { _id: req.params.bedId } } })
     const ward = await Ward.findById(req.params.wardId)
+
+    if (!ward) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
 
     if (!ward.beds.find(bed => bed._id.equals(req.params.bedId))) {
       throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
@@ -86,14 +92,13 @@ exports.view = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
   try {
-    const newBed = req.body.bed
+    const newBed = req.body
     if (!ObjectId.isValid(req.params.wardId)) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
     if (newBed.deviceId && !ObjectId.isValid(newBed.deviceId)) throw new APIError('Invalid device ID', httpStatus.INTERNAL_SERVER_ERROR)
 
     const ward = await Ward.findById(req.params.wardId).where('beds._id').equals(req.params.bedId)
 
-    console.log(ward)
-    if (!ward) throw new APIError('Invalid bed id', httpStatus.INTERNAL_SERVER_ERROR)
+    if (!ward) throw new APIError('Invalid bed ID', httpStatus.INTERNAL_SERVER_ERROR)
 
     if (newBed.number) {
       ward.beds.forEach(bed => {
