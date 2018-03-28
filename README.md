@@ -1,4 +1,4 @@
-# Realtime Patients Monitoring System - Server [![Build Status](https://travis-ci.org/alentar/rpms-server.svg?branch=master)](https://travis-ci.org/alentar/rpms-server)
+# Realtime Patients Monitoring System - Server [![Build Status](https://travis-ci.org/alentar/rpms-server.svg?branch=master)](https://travis-ci.org/alentar/rpms-server)  [![Coverage Status](https://coveralls.io/repos/github/alentar/rpms-server/badge.svg?branch=master)](https://coveralls.io/github/alentar/rpms-server?branch=master)
 
 # Installation
 
