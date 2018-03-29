@@ -33,7 +33,7 @@ exports.selfAuthenticate = async (req, res, next) => {
 
     if (!device.isAssigned()) throw new DeviceError('Device not assigned', 'wait', httpStatus.FORBIDDEN)
 
-    return res.json({'status': 'operate'})
+    return res.json({id: device._id, status: 'operate'})
   } catch (error) {
     return next(error)
   }
