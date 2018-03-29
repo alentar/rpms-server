@@ -42,21 +42,25 @@ wardSchema.statics = {
     return err
   },
 
-  async list ({page = 1, perPage = 30}) {
+  async list ({page = 1, perPage = 30, sortBy = 'number', order = 'asc'}) {
     page = Number(page)
     perPage = Number(perPage)
 
     if (!page || page <= 0) throw new APIError('Invalid page')
     if (!perPage || (perPage <= 0 && perPage !== -1)) throw new APIError('Invalid perPage')
+    order = (order === 'asc' ? 1 : -1)
+    if (!['number', 'createdAt'].includes(sortBy)) sortBy = 'number'
+    const sorter = {}
+    sorter[sortBy] = order
 
     let results = null
     if (perPage === -1) {
-      results = await Ward.find().sort({'createdAt': -1})
+      results = await Ward.find().sort(sorter)
     } else {
       results = await Ward.find()
         .limit(perPage)
         .skip(perPage * (page - 1))
-        .sort({'createdAt': -1})
+        .sort(sorter)
     }
 
     const wards = results
