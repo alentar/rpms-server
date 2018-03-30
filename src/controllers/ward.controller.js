@@ -16,7 +16,7 @@ exports.create = async (req, res, next) => {
       ward: savedWard
     })
   } catch (err) {
-    return next(Ward.checkDuplicateWardeError(err))
+    return next(Ward.checkDuplicateWardError(err))
   }
 }
 
