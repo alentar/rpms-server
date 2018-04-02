@@ -171,7 +171,7 @@ userSchema.statics = {
 
     const users = results.map((result) => result.transform())
     const total = await User.find(find).count()
-    const pages = Math.ceil(total / perPage)
+    const pages = Math.ceil(total / Math.abs(perPage))
 
     return {users, pages, page, perPage, total}
   }
