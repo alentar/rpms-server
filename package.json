@@ -63,7 +63,6 @@
     "mongoose-error-handler": "^1.0.0",
     "morgan": "^1.9.0",
     "passport": "^0.4.0",
-    "passport-jwt": "^3.0.1",
-    "simple-stats-server": "0.0.5"
+    "passport-jwt": "^3.0.1"
   }
 }
