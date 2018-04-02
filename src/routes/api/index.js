@@ -5,7 +5,7 @@ const authRouter = require('./auth')
 const userRouter = require('./user')
 const wardRouter = require('./ward')
 const deviceRouter = require('./device')
-var serverStatus = require('express-server-status')
+const serverStatus = require('express-server-status')
 
 /**
  *
