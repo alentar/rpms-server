@@ -1,6 +1,7 @@
 'use strict'
 
 const Ward = require('../models/ward.model')
+const Bed = require('../models/bed.model').Bed
 const Device = require('../models/device.model')
 const httpStatus = require('http-status')
 const APIError = require('../utils/APIError')
@@ -31,11 +32,11 @@ exports.create = async (req, res, next) => {
 
     if (newBed.deviceId) { await Device.checkDeviceAssigned(newBed.deviceId) }
 
-    ward.beds.push(newBed)
+    const bed = new Bed(newBed)
+    ward.beds.push(bed)
+    await ward.save()
 
-    const savedWard = await ward.save()
-
-    return res.json({ward: savedWard})
+    return res.json({ bed })
   } catch (err) {
     return next(err)
   }
@@ -49,6 +50,7 @@ exports.bulkCreate = async (req, res, next) => {
     if (!ward) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
 
     let excludes = []
+    let beds = []
     const start = req.body.start
     const end = req.body.end
 
@@ -59,11 +61,19 @@ exports.bulkCreate = async (req, res, next) => {
     for (let index = start; index <= end; index++) {
       if (excludes.includes(index)) continue
 
-      ward.beds.push({ number: index })
+      beds.push(new Bed({ number: index }))
     }
 
-    const savedWard = await ward.save()
-    return res.json({ward: savedWard})
+    // Save ward with new beds
+    await Ward.findByIdAndUpdate(req.params.wardId, {
+      $push: {
+        'beds': {
+          $each: beds
+        }
+      }
+    })
+
+    return res.json({ beds })
   } catch (error) {
     return next(error)
   }
@@ -84,10 +94,10 @@ exports.delete = async (req, res, next) => {
     }
 
     ward.beds.pull(req.params.bedId)
-    const savedWard = await ward.save()
+    await ward.save()
 
     return res.json({
-      ward: savedWard
+      success: true
     })
   } catch (error) {
     return next(error)
@@ -121,8 +131,8 @@ exports.view = async (req, res, next) => {
 exports.update = async (req, res, next) => {
   try {
     const newBed = req.body
+    const updateSchema = {}
     if (!ObjectId.isValid(req.params.wardId)) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
-    if (newBed.deviceId && !ObjectId.isValid(newBed.deviceId)) throw new APIError('Invalid device ID', httpStatus.INTERNAL_SERVER_ERROR)
 
     const ward = await Ward.findById(req.params.wardId).where('beds._id').equals(req.params.bedId)
 
@@ -141,22 +151,22 @@ exports.update = async (req, res, next) => {
           throw error
         }
       })
-    }
 
-    if (newBed.deviceId) { await Device.checkDeviceAssigned(newBed.deviceId) }
+      updateSchema['beds.$.number'] = newBed.number
+    }
 
     const savedWard = await Ward.findOneAndUpdate({
       '_id': req.params.wardId,
       'beds._id': req.params.bedId
     }, {
-      '$set': {
-        'beds.$': newBed
-      }
+      '$set': updateSchema
     }, {
       new: true
     })
 
-    return res.json({ward: savedWard})
+    const bed = savedWard.beds.find(bed => bed._id.equals(req.params.bedId))
+
+    return res.json({ bed })
   } catch (err) {
     return next(err)
   }
