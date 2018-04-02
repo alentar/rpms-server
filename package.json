@@ -48,6 +48,7 @@
     "crypto": "^1.0.1",
     "dotenv": "^5.0.1",
     "express": "^4.16.2",
+    "express-server-status": "^1.0.3",
     "express-validation": "^1.0.2",
     "figlet": "^1.2.0",
     "helmet": "^3.11.0",
@@ -62,6 +63,7 @@
     "mongoose-error-handler": "^1.0.0",
     "morgan": "^1.9.0",
     "passport": "^0.4.0",
-    "passport-jwt": "^3.0.1"
+    "passport-jwt": "^3.0.1",
+    "simple-stats-server": "0.0.5"
   }
 }
