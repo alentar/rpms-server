@@ -75,6 +75,8 @@ deviceSchema.statics = {
     if (!device) throw new APIError('Device not found', httpStatus.NOT_FOUND)
     if (!device.isAuthorized()) throw new APIError('Unauthorized device')
     if (device.isAssigned()) throw new APIError('Device already assigned for a beds')
+
+    return Promise.resolve(false)
   },
 
   async getAuthorizedDevices () {
