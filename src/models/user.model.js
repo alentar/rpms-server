@@ -7,6 +7,9 @@ const config = require('../config')
 const jwt = require('jsonwebtoken')
 const moment = require('moment')
 const Schema = mongoose.Schema
+const Notification = require('./notification.model')
+const kue = require('kue')
+const queue = kue.createQueue({jobEvents: false})
 
 const roles = [ 'nurse', 'doctor', 'admin' ]
 const genders = [ 'male', 'female' ]
@@ -25,7 +28,7 @@ const userSchema = new Schema({
     type: String,
     required: true,
     minlength: 6,
-    maxlength: 50
+    maxlength: 100
   },
   name: {
     type: String,
@@ -51,7 +54,13 @@ const userSchema = new Schema({
     type: String,
     default: 'admin',
     enum: roles
-  }
+  },
+  notifications: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Notification'
+    }
+  ]
 }, {
   timestamps: true
 })
@@ -103,6 +112,31 @@ userSchema.statics = {
   genders,
 
   titles,
+
+  notify (role = 'admin', payload) {
+    const critaria = {}
+    if (role !== 'all') critaria['role'] = role
+
+    const job = queue.create('bulk_notifications', {
+      critaria, payload
+    })
+
+    job.save()
+  },
+
+  async sendBulkNotifications (critaria, payload) {
+    const users = await User.find(critaria)
+
+    for (let i = 0; i < users.length; i++) {
+      const notification = new Notification(payload)
+      await notification.save()
+      users[i].notifications.push(notification._id)
+      await users[i].save()
+    }
+
+    console.log(users.length, 'was awared')
+    return Promise.resolve()
+  },
 
   checkDuplicateNicError (err) {
     if (err.code === 11000) {
@@ -176,6 +210,14 @@ userSchema.statics = {
     return {users, pages, page, perPage, total}
   }
 }
+
+// process our jobs in queue
+queue.process('bulk_notifications', 10, (job, done) => {
+  User.sendBulkNotifications(job.data.critaria, job.data.payload)
+    .then(() => {
+      done()
+    })
+})
 
 const User = mongoose.model('User', userSchema)
 module.exports = User

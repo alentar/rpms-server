@@ -24,6 +24,11 @@ const notificationSchema = new mongoose.Schema({
   thumbnail: {
     type: String,
     default: ''
+  },
+
+  read: {
+    type: Boolean,
+    default: false
   }
 })
 
