@@ -11,6 +11,7 @@ const apiRouter = require('../routes/api')
 const passport = require('passport')
 const passportJwt = require('../services/passport')
 const socketio = require('socket.io')
+const path = require('path')
 require('./kue-queue') // run all the jobs in queue
 
 const app = express()
@@ -23,6 +24,9 @@ if (config.env !== 'test') app.use(morgan('combined'))
 // passport
 app.use(passport.initialize())
 passport.use('jwt', passportJwt.jwt)
+
+// serve static files
+app.use('/static', express.static(path.join(__dirname, '../../static')))
 
 app.use('/api', apiRouter)
 app.use(errorHandler.handleNotFound)

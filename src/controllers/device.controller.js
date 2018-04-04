@@ -22,7 +22,7 @@ exports.selfAuthenticate = async (req, res, next) => {
 
       User.notify('admin', {
         type: 'device',
-        thumbnail: '/somefile',
+        thumbnail: '/static/notifications/device-icon-48.png',
         title: 'New device added',
         content: 'A device wants to connect your system',
         action: 'navigate'

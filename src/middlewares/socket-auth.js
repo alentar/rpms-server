@@ -9,9 +9,9 @@ const auth = (socket, next) => {
   const handshake = socket.handshake
   const query = handshake.query
 
-  if (!query.token) next(new Error('No authentication token found'))
-
   try {
+    if (query.token === null || query.token === undefined) throw new Error('No authentication token found')
+    console.log(query.token)
     const tokenData = query.token.split(' ')
 
     if (tokenData.length < 2) throw new Error('Invalid token')
@@ -19,7 +19,7 @@ const auth = (socket, next) => {
     findUser(socket, next, decoded.sub)
   } catch (error) {
     console.log(error)
-    next(error)
+    return next(error)
   }
 }
 

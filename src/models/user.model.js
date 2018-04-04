@@ -9,6 +9,7 @@ const moment = require('moment')
 const Schema = mongoose.Schema
 const Notification = require('./notification.model')
 const queue = require('../services/kue')
+const redis = require('../services/redis')
 
 const roles = [ 'nurse', 'doctor', 'admin' ]
 const genders = [ 'male', 'female' ]
@@ -129,6 +130,11 @@ userSchema.statics = {
     for (let i = 0; i < users.length; i++) {
       const notification = new Notification(payload)
       await notification.save()
+
+      const socket = await redis.getAsync(`sio${users[i].id}`)
+      if (socket !== null) {
+        global.io.sockets.to(socket).emit('notification', notification)
+      }
       users[i].notifications.push(notification._id)
       await users[i].save()
     }
