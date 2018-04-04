@@ -148,6 +148,7 @@ deviceSchema.statics = {
     let results = null
     if (perPage === -1) {
       results = await Device.find(find).sort({'createdAt': order})
+      perPage = 1
     } else {
       results = await Device.find(find)
         .limit(perPage)
