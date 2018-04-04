@@ -4,15 +4,17 @@ const socketAuth = require('../middlewares/socket-auth')
 
 module.exports = (io) => {
   io.use(socketAuth)
+  let connectedClients = 0
 
   io.sockets.on('connection', (socket) => {
-    console.log(socket.user.sub, 'connected')
-
-    socket.join('admin')
-    io.to('admin').emit('joined', `${socket.user.sub}`)
+    connectedClients++
+    console.log(connectedClients)
+    console.log(socket.user.id, 'connected')
 
     socket.on('disconnect', () => {
-      console.log(`${socket.user.sub} disconnected`)
+      connectedClients--
+      console.log(connectedClients)
+      console.log(`${socket.user.id} disconnected`)
     })
   })
 }

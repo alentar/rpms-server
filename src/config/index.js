@@ -9,5 +9,8 @@ module.exports = {
   mongo: {
     uri: process.env.MONGOURI,
     testURI: process.env.MONGOTESTURI
+  },
+  redis: {
+    port: process.env.REDISPORT
   }
 }

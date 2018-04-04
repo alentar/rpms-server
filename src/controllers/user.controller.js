@@ -85,5 +85,5 @@ exports.index = async (req, res, next) => {
 }
 
 exports.me = (req, res, next) => {
-  return res.json(req.user.transform())
+  return res.json(req.user)
 }
