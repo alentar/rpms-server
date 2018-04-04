@@ -8,8 +8,7 @@ const jwt = require('jsonwebtoken')
 const moment = require('moment')
 const Schema = mongoose.Schema
 const Notification = require('./notification.model')
-const kue = require('kue')
-const queue = kue.createQueue({jobEvents: false})
+const queue = require('../services/kue')
 
 const roles = [ 'nurse', 'doctor', 'admin' ]
 const genders = [ 'male', 'female' ]
@@ -210,14 +209,6 @@ userSchema.statics = {
     return {users, pages, page, perPage, total}
   }
 }
-
-// process our jobs in queue
-queue.process('bulk_notifications', 10, (job, done) => {
-  User.sendBulkNotifications(job.data.critaria, job.data.payload)
-    .then(() => {
-      done()
-    })
-})
 
 const User = mongoose.model('User', userSchema)
 module.exports = User
