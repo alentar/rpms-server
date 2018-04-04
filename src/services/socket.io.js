@@ -6,15 +6,13 @@ module.exports = (io) => {
   io.use(socketAuth)
 
   io.sockets.on('connection', (socket) => {
-    console.log(socket.id, 'connected')
+    console.log(socket.user.sub, 'connected')
 
     socket.join('admin')
     io.to('admin').emit('joined', `${socket.user.sub}`)
 
-    io.emit('glob', 'global event')
-
     socket.on('disconnect', () => {
-      console.log('user disconnected')
+      console.log(`${socket.user.sub} disconnected`)
     })
   })
 }
