@@ -162,6 +162,7 @@ userSchema.statics = {
     let results = null
     if (perPage === -1) {
       results = await User.find(find).sort(sorter)
+      perPage = 1
     } else {
       results = await User.find(find)
         .limit(perPage)
@@ -171,7 +172,7 @@ userSchema.statics = {
 
     const users = results.map((result) => result.transform())
     const total = await User.find(find).count()
-    const pages = Math.ceil(total / Math.abs(perPage))
+    const pages = Math.ceil(total / perPage)
 
     return {users, pages, page, perPage, total}
   }

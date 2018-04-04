@@ -56,6 +56,7 @@ wardSchema.statics = {
     let results = null
     if (perPage === -1) {
       results = await Ward.find().sort(sorter)
+      perPage = 1
     } else {
       results = await Ward.find()
         .limit(perPage)
