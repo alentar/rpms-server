@@ -131,10 +131,11 @@ userSchema.statics = {
       const notification = new Notification(payload)
       await notification.save()
 
-      const socket = await redis.getAsync(`sio${users[i].id}`)
-      if (socket !== null) {
+      const sockets = await redis.smembersAsync(`sio${users[i].id}`)
+      sockets.forEach(socket => {
         global.io.sockets.to(socket).emit('notification', notification)
-      }
+      })
+
       users[i].notifications.push(notification._id)
       await users[i].save()
     }
