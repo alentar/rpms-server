@@ -11,7 +11,7 @@ const auth = (socket, next) => {
 
   try {
     if (query.token === null || query.token === undefined) throw new Error('No authentication token found')
-    console.log(query.token)
+
     const tokenData = query.token.split(' ')
 
     if (tokenData.length < 2) throw new Error('Invalid token')

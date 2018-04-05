@@ -9,13 +9,13 @@ module.exports = (io) => {
 
   io.sockets.on('connection', (socket) => {
     connectedClients++
-    console.log(connectedClients)
     console.log(socket.user.id, 'connected')
+    io.sockets.emit('userCount', connectedClients)
     redis.set(`sio${socket.user.id}`, socket.id)
 
     socket.on('disconnect', () => {
       connectedClients--
-      console.log(connectedClients)
+      io.sockets.emit('userCount', connectedClients)
       redis.del(`sio${socket.user.id}`)
       console.log(`${socket.user.id} disconnected`)
     })
