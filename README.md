@@ -2,7 +2,7 @@
 
 # Installation
 
-- Install NodeJS, MongoDB
+- Install NodeJS, MongoDB, Redis for your system (without redis this wont work)
 - Install `npm` or `yarn`
 - Rename `.env.example` to `.env`
 - Start MongoDB
