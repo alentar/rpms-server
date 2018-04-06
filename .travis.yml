@@ -5,6 +5,7 @@ node_js:
 
 services:
   - mongodb
+  - redis-server
 
 before_script:
   - yarn add global gulp
