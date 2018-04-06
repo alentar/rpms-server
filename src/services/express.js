@@ -10,6 +10,9 @@ const errorHandler = require('../middlewares/error-handler')
 const apiRouter = require('../routes/api')
 const passport = require('passport')
 const passportJwt = require('../services/passport')
+const socketio = require('socket.io')
+const path = require('path')
+require('./kue-queue') // run all the jobs in queue
 
 const app = express()
 app.use(bodyParser.json())
@@ -22,13 +25,16 @@ if (config.env !== 'test') app.use(morgan('combined'))
 app.use(passport.initialize())
 passport.use('jwt', passportJwt.jwt)
 
+// serve static files
+app.use('/static', express.static(path.join(__dirname, '../../static')))
+
 app.use('/api', apiRouter)
 app.use(errorHandler.handleNotFound)
 app.use(errorHandler.handleDeviceError)
 app.use(errorHandler.handleError)
 
 exports.start = () => {
-  app.listen(config.port, (err) => {
+  const server = app.listen(config.port, (err) => {
     if (err) {
       console.log(`Error : ${err}`)
       process.exit(-1)
@@ -36,6 +42,9 @@ exports.start = () => {
 
     console.log(`${config.app} is running on http://localhost:${config.port}`)
   })
+
+  global.io = socketio(server)
+  require('./socket.io')(global.io)
 }
 
 exports.app = app

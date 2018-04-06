@@ -32,7 +32,7 @@ exports.refesh = async (req, res, next) => {
     const token = await generateTokenResponse(user, accessToken)
 
     return res.json({
-      token
+      user: user.transform(), token
     })
   } catch (error) {
     next(error)

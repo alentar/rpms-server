@@ -29,10 +29,11 @@ exports.view = async (req, res, next) => {
     if (!ObjectId.isValid(req.params.userID)) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
 
     const user = await User.findById(req.params.userID)
+      .select('-password -notifications')
 
     if (!user) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
 
-    return res.json({ user: user.transform() })
+    return res.json({ user })
   } catch (error) {
     return next(error)
   }
@@ -84,6 +85,14 @@ exports.index = async (req, res, next) => {
   }
 }
 
-exports.me = (req, res, next) => {
-  return res.json(req.user.transform())
+exports.me = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id)
+      .populate({path: 'notifications', options: { sort: { createdAt: -1 }, limit: 10 }})
+      .select('-password')
+
+    return res.json({ user })
+  } catch (error) {
+    return next(error)
+  }
 }

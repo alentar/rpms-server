@@ -1,5 +1,6 @@
 'use strict'
 
+const User = require('../models/user.model')
 const Device = require('../models/device.model')
 const httpStatus = require('http-status')
 const APIError = require('../utils/APIError')
@@ -18,6 +19,14 @@ exports.selfAuthenticate = async (req, res, next) => {
     if (!device) {
       const newDevice = new Device(req.body)
       device = await newDevice.save()
+
+      User.notify('admin', {
+        type: 'device',
+        thumbnail: '/static/notifications/device-icon-48.png',
+        title: 'New device wants to connect',
+        content: 'A device wants to connect your system',
+        action: 'navigate'
+      })
 
       // we need to return that the device is registered
       res.status(httpStatus.CREATED)
