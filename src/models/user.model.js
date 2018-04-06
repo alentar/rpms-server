@@ -82,10 +82,22 @@ userSchema.pre('save', async function save (next) {
 userSchema.method({
   transform () {
     const transformed = {}
-    const fields = ['id', 'name', 'nic', 'createdAt', 'role', 'registerID', 'contacts', 'gender', 'title']
+    const fields = [
+      '_id',
+      'name',
+      'nic',
+      'createdAt',
+      'role',
+      'registerID',
+      'contacts',
+      'gender',
+      'title',
+      'notifications',
+      'unread'
+    ]
 
     fields.forEach((field) => {
-      transformed[field] = this[field]
+      if (field in this) transformed[field] = this[field]
     })
 
     return transformed
@@ -159,26 +171,67 @@ userSchema.statics = {
     return err
   },
 
+  async getUnreadNotifications (id) {
+    const results = await User.aggregate([
+      {
+        $match: {
+          _id: { $eq: mongoose.Types.ObjectId(id) }
+        }
+      },
+      {
+        $lookup: {
+          from: 'notifications',
+          localField: 'notifications',
+          foreignField: '_id',
+          as: 'notification'
+        }
+      },
+      {
+        $unwind: '$notification'
+      },
+      {
+        $match: {
+          'notification.read': false
+        }
+      }, {
+        $count: 'unread'
+      }
+    ])
+
+    console.log(results)
+
+    if (results.length === 0) return Promise.resolve(0)
+    return Promise.resolve(results[0].unread)
+  },
+
   async findAndGenerateToken (payload) {
     const { nic, password, refreshObject } = payload
 
     // lets issue token if refreshObject is present
     if (refreshObject) {
-      const user = await User.findOne({userID: refreshObject.userID})
+      const user = await User.findById(refreshObject.userId)
+        .populate({path: 'notifications', options: { sort: { createdAt: -1 }, limit: 10 }})
+        .select('-password')
+        .exec()
 
       if (!user) throw new APIError(`Invalid token`, httpStatus.UNAUTHORIZED)
 
+      user.unread = await User.getUnreadNotifications(refreshObject.userId)
       return { user: user, accessToken: user.token() }
     }
 
     if (!nic) throw new APIError('Nic must be provided for login')
 
-    const user = await this.findOne({ nic }).exec()
+    const user = await User.findOne({ 'nic': nic })
+      .populate({path: 'notifications', options: { sort: { createdAt: -1 }, limit: 10 }})
+
     if (!user) throw new APIError(`No user associated with ${nic}`, httpStatus.NOT_FOUND)
 
     const passwordOK = await user.passwordMatches(password)
 
     if (!passwordOK) throw new APIError(`Password mismatch`, httpStatus.UNAUTHORIZED)
+
+    user.unread = await User.getUnreadNotifications(user._id)
 
     return { user: user, accessToken: user.token() }
   },
@@ -201,20 +254,20 @@ userSchema.statics = {
 
     let results = null
     if (perPage === -1) {
-      results = await User.find(find).sort(sorter)
+      results = await User.find(find).select('-password -notifications').sort(sorter)
       perPage = 1
     } else {
       results = await User.find(find)
+        .select('-password -notifications')
         .limit(perPage)
         .skip(perPage * (page - 1))
         .sort(sorter)
     }
 
-    const users = results.map((result) => result.transform())
     const total = await User.find(find).count()
     const pages = Math.ceil(total / perPage)
 
-    return {users, pages, page, perPage, total}
+    return {users: results, pages, page, perPage, total}
   }
 }
 

@@ -14,23 +14,22 @@ const jwtOptions = {
 }
 
 const jwtStrategy = new JwtStrategy(jwtOptions, (jwtPayload, done) => {
+  // get from redis or find
   redis.get(jwtPayload.sub, (err, rep) => {
-    console.log(jwtPayload.sub)
     if (err) {
       console.log(err)
       return done(err)
     }
 
     if (!rep) {
-      User.findById(jwtPayload.sub, (err, user) => {
+      User.findById(jwtPayload.sub).select('-password -contacts -notifications').exec((err, user) => {
         if (err) {
           return done(err, null)
         }
 
         if (user) {
-          const transformed = user.transform()
-          redis.set(jwtPayload.sub, JSON.stringify(transformed))
-          return done(null, transformed)
+          redis.set(jwtPayload.sub, JSON.stringify(user), 'EX', 600)
+          return done(null, user)
         } else {
           return done(null, false)
         }
