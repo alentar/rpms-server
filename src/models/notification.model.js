@@ -8,6 +8,11 @@ const notificationSchema = new mongoose.Schema({
     default: 'general'
   },
 
+  context: {
+    type: String,
+    default: ''
+  },
+
   title: {
     type: String
   },

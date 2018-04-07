@@ -13,6 +13,9 @@ module.exports = (io) => {
       if (hasClients === 0) ++connectedClients
       io.sockets.emit('userCount', connectedClients)
       await redis.saddAsync(`sio${socket.user._id}`, [socket.id])
+
+      // join user to room with its role
+      socket.join(socket.user.role)
     } catch (error) {
       console.error(error)
     }
