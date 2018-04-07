@@ -23,9 +23,10 @@ exports.selfAuthenticate = async (req, res, next) => {
       User.notify('admin', {
         type: 'device',
         thumbnail: '/public/static/notifications/device-icon-48.png',
-        title: 'New device wants to connect',
-        content: 'A device wants to connect your system',
-        action: 'navigate'
+        title: 'A new device wants to connect',
+        content: 'A device wants to connect your system.',
+        action: 'navigate',
+        context: 'new'
       })
 
       // we need to return that the device is registered
