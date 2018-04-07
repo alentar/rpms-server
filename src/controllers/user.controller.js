@@ -138,7 +138,7 @@ exports.markNotificationAsRead = async (req, res, next) => {
 
     const result = await Notfication.findByIdAndUpdate(notficationId, { read: req.query.read === 'true' }, { new: true })
     if (result === null) throw new APIError('Something went wrong')
-    return res.json({ _id: result._id, read: result.read })
+    return res.json({ ...result._doc })
   } catch (error) {
     return next(error)
   }
