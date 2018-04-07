@@ -19,7 +19,7 @@ app.use(bodyParser.json())
 app.use(cors())
 app.use(helmet())
 
-if (config.env !== 'test') app.use(morgan('combined'))
+if (config.env !== 'prod') app.use(morgan('combined'))
 
 // passport
 app.use(passport.initialize())
