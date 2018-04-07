@@ -11,8 +11,7 @@ gulp.task('nodemon', () => {
   nodemon({
     script: 'src/index.js',
     ext: 'js',
-    ignore: ['node_modules/**', 'docs/**'],
-    env: { 'NODE_ENV': 'dev' }
+    ignore: ['node_modules/**', 'docs/**']
   }).on('restart', function (files) {
     console.log('App restarted due to: ', files)
   })

@@ -144,6 +144,8 @@ router.post('/', auth(['admin']), validator(create), userController.create)
  */
 router.get('/me', auth(), userController.me)
 
+router.get('/me/notifications', auth(), userController.myNotifications)
+
 /**
  *
  * @api {get} /api/users/:id Get an user
@@ -268,5 +270,7 @@ router.delete('/:userID', auth(['admin']), userController.delete)
  * @apiError {409} DuplicateNIC       Nic is already taken
  */
 router.put('/:userID', auth(), validator(update), userController.update)
+
+router.put('/me/notifications/:notificationId', auth(), userController.markNotificationAsRead)
 
 module.exports = router
