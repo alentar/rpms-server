@@ -14,6 +14,8 @@ const bedSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Device'
   }
+}, {
+  timestamps: true
 })
 
 const Bed = mongoose.model('Bed', bedSchema)
