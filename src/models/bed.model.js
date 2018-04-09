@@ -13,6 +13,11 @@ const bedSchema = new mongoose.Schema({
   deviceId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Device'
+  },
+
+  patient: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Patient'
   }
 }, {
   timestamps: true

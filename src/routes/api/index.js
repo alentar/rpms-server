@@ -5,6 +5,7 @@ const authRouter = require('./auth')
 const userRouter = require('./user')
 const wardRouter = require('./ward')
 const deviceRouter = require('./device')
+const patientRouter = require('./patient')
 
 /**
  *
@@ -28,5 +29,6 @@ router.use('/auth', authRouter) // mount auth routes
 router.use('/users', userRouter) // mount user routes
 router.use('/wards', wardRouter) // mount ward routes
 router.use('/devices', deviceRouter) // mount device routes
+router.use('/patients', patientRouter) // mount patient routes
 
 module.exports = router
