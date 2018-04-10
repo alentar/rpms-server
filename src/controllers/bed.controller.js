@@ -167,3 +167,11 @@ exports.update = async (req, res, next) => {
     return next(err)
   }
 }
+
+exports.attachDevice = (req, res, next) => {
+  try {
+
+  } catch (error) {
+
+  }
+}
