@@ -2,7 +2,6 @@
 
 const Ward = require('../models/ward.model')
 const Bed = require('../models/bed.model').Bed
-const Device = require('../models/device.model')
 const httpStatus = require('http-status')
 const APIError = require('../utils/APIError')
 const ObjectId = require('mongoose').Types.ObjectId
@@ -11,7 +10,6 @@ exports.create = async (req, res, next) => {
   try {
     const newBed = req.body
     if (!ObjectId.isValid(req.params.wardId)) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
-    if (newBed.deviceId && !ObjectId.isValid(newBed.deviceId)) throw new APIError('Invalid device ID', httpStatus.INTERNAL_SERVER_ERROR)
 
     const ward = await Ward.findById(req.params.wardId)
 
@@ -29,8 +27,6 @@ exports.create = async (req, res, next) => {
         throw error
       }
     })
-
-    if (newBed.deviceId) { await Device.checkDeviceAssigned(newBed.deviceId) }
 
     const bed = new Bed(newBed)
     ward.beds.push(bed)
@@ -169,5 +165,13 @@ exports.update = async (req, res, next) => {
     return res.json({ bed })
   } catch (err) {
     return next(err)
+  }
+}
+
+exports.attachDevice = (req, res, next) => {
+  try {
+
+  } catch (error) {
+
   }
 }
