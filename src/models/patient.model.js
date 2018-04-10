@@ -2,6 +2,7 @@
 
 const mongoose = require('mongoose')
 const httpStatus = require('http-status')
+const APIError = require('../utils/APIError')
 
 const patientSchema = new mongoose.Schema({
   bht: {
@@ -38,7 +39,7 @@ const patientSchema = new mongoose.Schema({
 
   dischargedAt: {
     type: Date,
-    default: ''
+    default: null
   },
 
   dischargedBy: {
@@ -53,7 +54,7 @@ const patientSchema = new mongoose.Schema({
 
   dob: {
     type: Date,
-    default: ''
+    default: null
   },
 
   age: {
@@ -63,12 +64,12 @@ const patientSchema = new mongoose.Schema({
 
   nationality: {
     type: String,
-    default: 'Sinhala'
+    default: ''
   },
 
   religion: {
     type: String,
-    default: 'Buddhist'
+    default: ''
   },
 
   occupation: {
@@ -126,13 +127,23 @@ const patientSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'PatientRecord'
     }
-  ]
+  ],
+
+  ward: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Ward'
+  },
+
+  bed: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Bed'
+  }
 }, {
   timestamps: true
 })
 
 patientSchema.statics = {
-  checkDuplicateNicError (err) {
+  checkDuplicateBHTError (err) {
     if (err.code === 11000) {
       var error = new Error('BHT already taken')
       error.errors = [{
@@ -145,6 +156,39 @@ patientSchema.statics = {
     }
 
     return err
+  },
+
+  async list ({ page = 1, perPage = 30, sortBy = 'createdAt', order = 'desc' }) {
+    page = Number(page)
+    perPage = Number(perPage)
+
+    if (!page || page <= 0) throw new APIError('Invalid page')
+    if (!perPage || (perPage <= 0 && perPage !== -1)) throw new APIError('Invalid perPage')
+    order = (order === 'asc' ? 1 : -1)
+
+    const fields = ['name', 'nic', 'createdAt', 'bht']
+    sortBy = !fields.includes(sortBy) ? 'createdAt' : sortBy
+    const sorter = {}
+    sorter[sortBy] = order
+
+    const find = {}
+
+    let results = null
+    if (perPage === -1) {
+      results = await Patient.find(find).select('-records').sort(sorter)
+      perPage = 1
+    } else {
+      results = await Patient.find(find)
+        .select('-records')
+        .limit(perPage)
+        .skip(perPage * (page - 1))
+        .sort(sorter)
+    }
+
+    const total = await Patient.find(find).count()
+    const pages = Math.ceil(total / perPage)
+
+    return {users: results, pages, page, perPage, total}
   }
 }
 

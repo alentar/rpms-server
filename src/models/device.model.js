@@ -35,6 +35,11 @@ const deviceSchema = new mongoose.Schema({
   blacklisted: {
     type: Boolean,
     default: false
+  },
+
+  mqttTopic: {
+    type: String,
+    default: null
   }
 }, {
   timestamps: true
