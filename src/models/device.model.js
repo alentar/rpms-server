@@ -56,6 +56,10 @@ deviceSchema.method({
 
   isBlacklisted () {
     return this.blacklisted === true
+  },
+
+  hasTopic () {
+    return this.mqttTopic !== null
   }
 })
 
