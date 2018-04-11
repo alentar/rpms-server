@@ -55,13 +55,38 @@ wardSchema.statics = {
 
     let results = null
     if (perPage === -1) {
-      results = await Ward.find().sort(sorter)
+      results = await Ward.aggregate([
+        {
+          $addFields: {
+            beds: {
+              $size: '$beds'
+            }
+          }
+        }
+      ])
       perPage = 1
     } else {
-      results = await Ward.find()
-        .limit(perPage)
-        .skip(perPage * (page - 1))
-        .sort(sorter)
+      results = await Ward.aggregate([
+        {
+          $addFields: {
+            beds: {
+              $size: '$beds'
+            }
+          }
+        },
+
+        {
+          $sort: sorter
+        },
+
+        {
+          $skip: perPage * (page - 1)
+        },
+
+        {
+          $limit: perPage
+        }
+      ])
     }
 
     const wards = results
