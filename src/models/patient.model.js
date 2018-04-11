@@ -197,7 +197,7 @@ patientSchema.statics = {
     const total = await Patient.find(find).count()
     const pages = Math.ceil(total / perPage)
 
-    return {users: results, pages, page, perPage, total}
+    return {patients: results, pages, page, perPage, total}
   }
 }
 
