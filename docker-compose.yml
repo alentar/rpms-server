@@ -1,0 +1,43 @@
+version: "2"
+services:
+  app:
+    container_name: app
+    build:
+      context: ./
+      dockerfile: app.dockerfile
+    ports:
+      - "3000:3000"
+    command: npm run dev:docker
+    volumes:
+      - ./:/usr/src/app
+      - ./node_modules:/usr/src/app/node_modules
+    depends_on:
+      - mongo
+      - redis
+    links:
+      - mongo
+      - redis
+
+  mongo:
+    container_name: mongo
+    image: mongo
+    volumes:
+      - mongo:/data/db
+    ports:
+      - "27017:27017"
+    logging:
+      driver: "none"
+
+  redis:
+    container_name: redis
+    image: redis
+    volumes:
+      - redis:/data
+    ports:
+      - "63791:6379"
+    logging:
+      driver: "none"
+
+volumes:
+  mongo:
+  redis:

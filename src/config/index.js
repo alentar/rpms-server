@@ -2,6 +2,7 @@ require('dotenv').config() // load .env file
 
 module.exports = {
   port: process.env.PORT,
+  host: process.env.HOST,
   app: process.env.APP,
   env: process.env.NODE_ENV,
   secret: process.env.APP_SECRET,
@@ -11,6 +12,7 @@ module.exports = {
     testURI: process.env.MONGOTESTURI
   },
   redis: {
+    host: process.env.REDISHOST,
     port: process.env.REDISPORT
   }
 }

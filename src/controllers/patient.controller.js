@@ -17,7 +17,6 @@ exports.admit = async (req, res, next) => {
     if (!result) throw new APIError('Invalid bed', httpStatus.INTERNAL_SERVER_ERROR)
     const bed = result.beds.find(v => ObjectId(req.body.bed).equals(v._id))
 
-    // we enforces only authorized devices are assigned to a bed, so its safe just to check whether bed has a device or not
     if (bed.patient !== null) throw new APIError('Bed already taken', httpStatus.INTERNAL_SERVER_ERROR)
 
     const record = req.body
@@ -37,6 +36,7 @@ exports.admit = async (req, res, next) => {
       }
     })
 
+    // we enforces only authorized devices are assigned to a bed, so its safe just to check whether bed has a device or not
     if (bed.device !== null) {
       // if bed has a device just set the mqtt topics so they can connect on the fly
       const mqttTopic = `wards/${req.body.ward}/patient/${saved._id}`

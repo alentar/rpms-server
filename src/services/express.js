@@ -34,13 +34,13 @@ app.use(errorHandler.handleDeviceError)
 app.use(errorHandler.handleError)
 
 exports.start = () => {
-  const server = app.listen(config.port, (err) => {
+  const server = app.listen(config.port, config.host, (err) => {
     if (err) {
       console.log(`Error : ${err}`)
       process.exit(-1)
     }
 
-    console.log(`${config.app} is running on http://localhost:${config.port}`)
+    console.log(`${config.app} is running on http://${config.host}:${config.port}`)
   })
 
   global.io = socketio(server)

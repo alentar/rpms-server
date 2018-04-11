@@ -12,5 +12,7 @@ router.post('/bulk', auth(['admin']), validator(bulkCreate), bedController.bulkC
 router.put('/:bedId', auth(['admin']), validator(update), bedController.update)
 router.delete('/:bedId', auth(['admin']), bedController.delete)
 router.get('/:bedId', auth(), bedController.view)
+router.put('/:bedId/attach/:deviceId', auth(['admin']), bedController.attachDevice)
+router.put('/:bedId/detach/:deviceId', auth(['admin']), bedController.detachDevice)
 
 module.exports = router
