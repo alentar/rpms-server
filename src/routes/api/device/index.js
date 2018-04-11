@@ -21,4 +21,7 @@ router.post('/:deviceId/unauthorize', auth(['admin']), deviceController.unauthor
 router.post('/:deviceId/assign', auth(['admin']), deviceController.assign)
 router.post('/:deviceId/unassign', auth(['admin']), deviceController.unassign)
 
+router.put('/:deviceId/attach/:wardId/:bedId', auth(['admin']), deviceController.attachDevice)
+router.put('/:deviceId/detach/:wardId/:bedId', auth(['admin']), deviceController.detachDevice)
+
 module.exports = router

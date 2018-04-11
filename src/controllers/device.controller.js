@@ -2,6 +2,7 @@
 
 const User = require('../models/user.model')
 const Device = require('../models/device.model')
+const Ward = require('../models/ward.model')
 const httpStatus = require('http-status')
 const APIError = require('../utils/APIError')
 const DeviceError = require('../utils/DeviceError')
@@ -218,6 +219,74 @@ exports.unassign = async (req, res, next) => {
 
     return res.json({
       device
+    })
+  } catch (error) {
+    return next(error)
+  }
+}
+
+exports.attachDevice = async (req, res, next) => {
+  try {
+    if (!ObjectId.isValid(req.params.deviceId)) throw new APIError('Requested device not found', httpStatus.NOT_FOUND)
+    if (!ObjectId.isValid(req.params.wardId)) throw new APIError('Requested ward not found', httpStatus.NOT_FOUND)
+    if (!ObjectId.isValid(req.params.bedId)) throw new APIError('Requested bed not found', httpStatus.NOT_FOUND)
+
+    const device = await Device.checkDeviceAssigned(req.params.deviceId)
+    const savedWard = await Ward.findOneAndUpdate({
+      '_id': req.params.wardId,
+      'beds._id': req.params.bedId
+    }, {
+      '$set': {
+        'beds.$.device': device._id
+      }
+    }, {
+      new: true
+    })
+
+    if (!savedWard) throw new APIError('Requested ward not found', httpStatus.NOT_FOUND)
+
+    device.assigned = true
+    device.mqttTopic = null
+    await device.save()
+
+    const bed = savedWard.beds.find(v => ObjectId(req.params.bedId).equals())
+
+    return res.json({
+      device: device,
+      bed: bed
+    })
+  } catch (error) {
+    return next(error)
+  }
+}
+
+exports.detachDevice = async (req, res, next) => {
+  try {
+    if (!ObjectId.isValid(req.params.deviceId)) throw new APIError('Requested device not found', httpStatus.NOT_FOUND)
+    if (!ObjectId.isValid(req.params.wardId)) throw new APIError('Requested ward not found', httpStatus.NOT_FOUND)
+    if (!ObjectId.isValid(req.params.bedId)) throw new APIError('Requested bed not found', httpStatus.NOT_FOUND)
+
+    const device = await Device.findByIdAndUpdate(req.params.deviceId, {assigned: false, mqttTopic: null}, {new: true})
+    if (!device) throw new APIError('Requested device not found', httpStatus.NOT_FOUND)
+
+    const savedWard = await Ward.findOneAndUpdate({
+      '_id': req.params.wardId,
+      'beds._id': req.params.bedId
+    }, {
+      '$set': {
+        'beds.$.device': null
+      }
+    }, {
+      new: true
+    })
+
+    if (!savedWard) throw new APIError('Requested ward not found', httpStatus.NOT_FOUND)
+
+    const bed = savedWard.beds.find(v => ObjectId(req.params.bedId).equals())
+
+    return res.json({
+      device: device,
+      bed: bed
     })
   } catch (error) {
     return next(error)
