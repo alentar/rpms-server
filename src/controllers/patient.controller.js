@@ -146,7 +146,10 @@ exports.view = async (req, res, next) => {
   try {
     if (!ObjectId.isValid(req.params.patient)) throw new APIError('Invalid patient', httpStatus.INTERNAL_SERVER_ERROR)
 
-    const patient = await Patient.findById(req.params.patient).select('-records')
+    const patient = await Patient.findById(req.params.patient).populate('admittedBy', 'nic name')
+      .populate('dischargedBy', 'nic name')
+      .populate('ward', 'number name')
+      .select('-records')
 
     if (!patient) throw new APIError('Patient not found', httpStatus.NOT_FOUND)
 
