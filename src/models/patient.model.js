@@ -175,11 +175,20 @@ patientSchema.statics = {
 
     let results = null
     if (perPage === -1) {
-      results = await Patient.find(find).select('-records').sort(sorter)
+      results = await Patient.find(find)
+        .populate('dischargedBy', 'nic name')
+        .populate('admittedBy', 'nic name')
+        .populate('ward', 'number name')
+        .select('-records -telephones')
+        .sort(sorter)
+
       perPage = 1
     } else {
       results = await Patient.find(find)
-        .select('-records')
+        .populate('dischargedBy', 'nic name')
+        .populate('admittedBy', 'nic name')
+        .populate('ward', 'number name')
+        .select('-records -telephones')
         .limit(perPage)
         .skip(perPage * (page - 1))
         .sort(sorter)
@@ -188,7 +197,7 @@ patientSchema.statics = {
     const total = await Patient.find(find).count()
     const pages = Math.ceil(total / perPage)
 
-    return {users: results, pages, page, perPage, total}
+    return {patients: results, pages, page, perPage, total}
   }
 }
 
