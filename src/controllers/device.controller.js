@@ -118,13 +118,33 @@ exports.blacklist = async (req, res, next) => {
     const deviceId = req.params.deviceId
     if (!ObjectId.isValid(deviceId)) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
 
-    const device = await Device.findByIdAndUpdate(deviceId, { blacklisted: true, authorized: false, assigned: false }, { new: true })
-    // need to fire an event to inform socket connection
-
+    const device = await Device.findById(deviceId)
     if (!device) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
 
+    const savedWard = await Ward.findOneAndUpdate({
+      '_id': device.ward,
+      'beds._id': device.bed
+    }, {
+      '$set': {
+        'beds.$.device': null
+      }
+    }, {
+      new: true
+    })
+
+    if (!savedWard) throw new APIError('Requested ward not found', httpStatus.NOT_FOUND)
+
+    device.blacklisted = true
+    device.authorized = false
+    device.assigned = false
+    device.ward = null
+    device.bed = null
+
+    const saved = await device.save()
+    // need to fire an event to inform socket connection
+
     return res.json({
-      device
+      device: saved
     })
   } catch (error) {
     return next(error)
@@ -174,51 +194,31 @@ exports.unauthorize = async (req, res, next) => {
     const deviceId = req.params.deviceId
     if (!ObjectId.isValid(deviceId)) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
 
-    const device = await Device.findByIdAndUpdate(deviceId, { authorized: false, assigned: false }, { new: true })
-
-    if (!device) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
-
-    return res.json({
-      device
-    })
-  } catch (error) {
-    return next(error)
-  }
-}
-
-exports.assign = async (req, res, next) => {
-  try {
-    const deviceId = req.params.deviceId
-    if (!ObjectId.isValid(deviceId)) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
-
     const device = await Device.findById(deviceId)
-
     if (!device) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
-    if (device.isBlacklisted()) throw new APIError('Blacklisted device', httpStatus.UNAUTHORIZED)
-    if (!device.isAuthorized()) throw new APIError('Unauthorized device', httpStatus.UNAUTHORIZED)
 
-    device.assigned = true
-    const savedDevice = await device.save()
-
-    return res.json({
-      device: savedDevice
+    const savedWard = await Ward.findOneAndUpdate({
+      '_id': device.ward,
+      'beds._id': device.bed
+    }, {
+      '$set': {
+        'beds.$.device': null
+      }
+    }, {
+      new: true
     })
-  } catch (error) {
-    return next(error)
-  }
-}
 
-exports.unassign = async (req, res, next) => {
-  try {
-    const deviceId = req.params.deviceId
-    if (!ObjectId.isValid(deviceId)) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
+    if (!savedWard) throw new APIError('Requested ward not found', httpStatus.NOT_FOUND)
 
-    const device = await Device.findByIdAndUpdate(deviceId, { assigned: false }, { new: true })
+    device.authorized = false
+    device.assigned = false
+    device.ward = null
+    device.bed = null
 
-    if (!device) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
+    const saved = await device.save()
 
     return res.json({
-      device
+      device: saved
     })
   } catch (error) {
     return next(error)
@@ -247,6 +247,8 @@ exports.attachDevice = async (req, res, next) => {
 
     device.assigned = true
     device.mqttTopic = null
+    device.ward = req.params.wardId
+    device.bed = req.params.bedId
     await device.save()
 
     const bed = savedWard.beds.find(v => ObjectId(req.params.bedId).equals())
@@ -266,7 +268,12 @@ exports.detachDevice = async (req, res, next) => {
     if (!ObjectId.isValid(req.params.wardId)) throw new APIError('Requested ward not found', httpStatus.NOT_FOUND)
     if (!ObjectId.isValid(req.params.bedId)) throw new APIError('Requested bed not found', httpStatus.NOT_FOUND)
 
-    const device = await Device.findByIdAndUpdate(req.params.deviceId, {assigned: false, mqttTopic: null}, {new: true})
+    const device = await Device.findByIdAndUpdate(req.params.deviceId, {
+      assigned: false,
+      mqttTopic: null,
+      ward: null,
+      bed: null
+    }, {new: true})
     if (!device) throw new APIError('Requested device not found', httpStatus.NOT_FOUND)
 
     const savedWard = await Ward.findOneAndUpdate({
