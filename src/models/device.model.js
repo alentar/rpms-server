@@ -40,6 +40,18 @@ const deviceSchema = new mongoose.Schema({
   mqttTopic: {
     type: String,
     default: null
+  },
+
+  ward: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Ward',
+    default: null
+  },
+
+  bed: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Bed',
+    default: null
   }
 }, {
   timestamps: true
