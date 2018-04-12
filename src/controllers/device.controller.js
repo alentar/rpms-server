@@ -44,7 +44,7 @@ exports.selfAuthenticate = async (req, res, next) => {
 
     if (!device.isAssigned()) throw new DeviceError('Device not assigned', 'wait', httpStatus.FORBIDDEN)
 
-    if (!device.hasTopic()) throw new DeviceError('Device not has no topic', 'wait', httpStatus.FORBIDDEN)
+    if (!device.hasTopic()) throw new DeviceError('Device has no topic', 'wait', httpStatus.FORBIDDEN)
 
     return res.json({id: device._id, status: 'operate', mqttTopic: device.mqttTopic})
   } catch (error) {
