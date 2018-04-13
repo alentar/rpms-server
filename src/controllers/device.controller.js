@@ -121,18 +121,20 @@ exports.blacklist = async (req, res, next) => {
     const device = await Device.findById(deviceId)
     if (!device) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
 
-    const savedWard = await Ward.findOneAndUpdate({
-      '_id': device.ward,
-      'beds._id': device.bed
-    }, {
-      '$set': {
-        'beds.$.device': null
-      }
-    }, {
-      new: true
-    })
+    if (device.ward !== null) {
+      const savedWard = await Ward.findOneAndUpdate({
+        '_id': device.ward,
+        'beds._id': device.bed
+      }, {
+        '$set': {
+          'beds.$.device': null
+        }
+      }, {
+        new: true
+      })
 
-    if (!savedWard) throw new APIError('Requested ward not found', httpStatus.NOT_FOUND)
+      if (!savedWard) throw new APIError('Requested ward not found', httpStatus.NOT_FOUND)
+    }
 
     device.blacklisted = true
     device.authorized = false
@@ -197,18 +199,20 @@ exports.unauthorize = async (req, res, next) => {
     const device = await Device.findById(deviceId)
     if (!device) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
 
-    const savedWard = await Ward.findOneAndUpdate({
-      '_id': device.ward,
-      'beds._id': device.bed
-    }, {
-      '$set': {
-        'beds.$.device': null
-      }
-    }, {
-      new: true
-    })
+    if (device.ward !== null) {
+      const savedWard = await Ward.findOneAndUpdate({
+        '_id': device.ward,
+        'beds._id': device.bed
+      }, {
+        '$set': {
+          'beds.$.device': null
+        }
+      }, {
+        new: true
+      })
 
-    if (!savedWard) throw new APIError('Requested ward not found', httpStatus.NOT_FOUND)
+      if (!savedWard) throw new APIError('Requested ward not found', httpStatus.NOT_FOUND)
+    }
 
     device.authorized = false
     device.assigned = false
