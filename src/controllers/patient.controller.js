@@ -135,7 +135,7 @@ exports.delete = async (req, res, next) => {
     }
 
     return res.json({
-      patient
+      status: 'OK'
     })
   } catch (error) {
     return next(error)
@@ -164,7 +164,7 @@ exports.update = async (req, res, next) => {
     if (!ObjectId.isValid(req.params.patient)) throw new APIError('Invalid patient', httpStatus.INTERNAL_SERVER_ERROR)
 
     const body = omit(req.body, [ 'bed', 'ward', 'records', 'admittedBy', 'admittedAt', 'dischargedAt', 'dischargedBy', 'discharged' ])
-    const patient = await Patient.findByIdAndUpdate(req.params.patient, body, {new: true})
+    const patient = await Patient.findByIdAndUpdate(req.params.patient, body, {new: true}).select('-records')
 
     if (!patient) throw new APIError('Patient not found', httpStatus.INTERNAL_SERVER_ERROR)
 

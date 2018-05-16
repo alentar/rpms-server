@@ -122,12 +122,15 @@ const patientSchema = new mongoose.Schema({
     default: ''
   },
 
-  records: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'PatientRecord'
-    }
-  ],
+  records: {
+    temperature: [{
+      type: Number
+    }],
+
+    bpm: [{
+      type: Number
+    }]
+  },
 
   ward: {
     type: mongoose.Schema.Types.ObjectId,
