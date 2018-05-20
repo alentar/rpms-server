@@ -46,7 +46,31 @@ exports.selfAuthenticate = async (req, res, next) => {
 
     if (!device.isAssigned()) throw new DeviceError('Device not assigned', 'wait', httpStatus.FORBIDDEN)
 
-    if (!device.hasTopic()) throw new DeviceError('Device has no topic', 'wait', httpStatus.FORBIDDEN)
+    if (!device.hasTopic()) {
+      if (device.bed !== null) {
+        const result = await Ward.findOne({
+          _id: ObjectId(device.ward)
+        }, {
+          beds: {
+            $elemMatch: {
+              _id: ObjectId(device.bed)
+            }
+          }
+        }).populate('beds.patient', '_id').limit(1)
+
+        if (result.beds.length === 0) throw new DeviceError('Device has no topic', 'wait', httpStatus.FORBIDDEN)
+
+        if (result.beds[0].patient !== null && result.beds[0].patient !== undefined) {
+          const mqttTopic = `wards/${device.ward}/patient/${result.beds[0].patient._id}`
+          await Device.findByIdAndUpdate(device._id, { mqttTopic: mqttTopic })
+          return res.json({id: device._id, status: 'operate', mqttTopic: mqttTopic})
+        } else {
+          throw new DeviceError('Device has no topic', 'wait', httpStatus.FORBIDDEN)
+        }
+      }
+
+      throw new DeviceError('Device has no topic', 'wait', httpStatus.FORBIDDEN)
+    }
 
     return res.json({id: device._id, status: 'operate', mqttTopic: device.mqttTopic})
   } catch (error) {

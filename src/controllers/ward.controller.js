@@ -53,7 +53,7 @@ exports.view = async (req, res, next) => {
   try {
     if (!ObjectId.isValid(req.params.wardId)) throw new APIError('Invalid resource identifier', httpStatus.NOT_FOUND)
 
-    const ward = await Ward.findById(req.params.wardId)
+    const ward = await Ward.findById(req.params.wardId).populate('beds.patient', ['name', 'age', 'admittedAt', 'sex', 'bht'])
 
     if (!ward) throw new APIError('Requested resource not found', httpStatus.NOT_FOUND)
 
