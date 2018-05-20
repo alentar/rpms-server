@@ -30,6 +30,8 @@ exports.selfAuthenticate = async (req, res, next) => {
         context: 'new'
       })
 
+      global.io.emit('device', device)
+
       // we need to return that the device is registered
       res.status(httpStatus.CREATED)
       return res.json({

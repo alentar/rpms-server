@@ -13,6 +13,7 @@ const passportJwt = require('../services/passport')
 const socketio = require('socket.io')
 const path = require('path')
 require('./kue-queue') // run all the jobs in queue
+require('./mqtt')
 
 const app = express()
 app.use(bodyParser.json())

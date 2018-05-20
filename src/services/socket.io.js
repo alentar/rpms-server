@@ -33,5 +33,13 @@ module.exports = (io) => {
         console.log(error)
       }
     })
+
+    socket.on('joinward', (ward) => {
+      socket.join(ward)
+    })
+
+    socket.on('leaveward', (ward) => {
+      socket.leave(ward)
+    })
   })
 }

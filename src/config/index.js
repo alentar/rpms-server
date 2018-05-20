@@ -14,5 +14,9 @@ module.exports = {
   redis: {
     host: process.env.REDISHOST,
     port: process.env.REDISPORT
+  },
+  mqtt: {
+    host: process.env.MQTT_HOST,
+    port: process.env.MQTT_PORT
   }
 }
