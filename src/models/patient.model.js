@@ -4,6 +4,12 @@ const mongoose = require('mongoose')
 const httpStatus = require('http-status')
 const APIError = require('../utils/APIError')
 
+const recordSchema = new mongoose.Schema({
+  value: {
+    type: Number
+  }
+}, { timestamps: true })
+
 const patientSchema = new mongoose.Schema({
   bht: {
     type: String,
@@ -122,12 +128,10 @@ const patientSchema = new mongoose.Schema({
     default: ''
   },
 
-  records: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'PatientRecord'
-    }
-  ],
+  records: {
+    temperature: [recordSchema],
+    bpm: [recordSchema]
+  },
 
   ward: {
     type: mongoose.Schema.Types.ObjectId,

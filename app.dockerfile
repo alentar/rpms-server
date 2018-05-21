@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:9.11
 
 RUN mkdir -p /usr/src/app
 
@@ -12,4 +12,4 @@ COPY . /usr/src/app
 
 EXPOSE 3000
 
-CMD [ "npm", "run", "dev:docker"  ]
+CMD [ "npm", "run", "dev:docker" ]

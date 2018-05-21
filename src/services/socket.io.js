@@ -33,5 +33,14 @@ module.exports = (io) => {
         console.log(error)
       }
     })
+
+    socket.on('join', (room) => {
+      console.log('joined')
+      socket.join(room)
+    })
+
+    socket.on('leave', (room) => {
+      socket.leave(room)
+    })
   })
 }
