@@ -58,7 +58,10 @@ exports.selfAuthenticate = async (req, res, next) => {
           }
         }).populate('beds.patient', '_id').limit(1)
 
-        if (result.beds.length === 0) throw new DeviceError('Device has no topic', 'wait', httpStatus.FORBIDDEN)
+        if (result.beds.length === 0) {
+          await Device.findByIdAndUpdate(device._id, { bed: null, ward: null })
+          throw new DeviceError('Device not assigned', 'wait', httpStatus.FORBIDDEN)
+        }
 
         if (result.beds[0].patient !== null && result.beds[0].patient !== undefined) {
           const mqttTopic = `wards/${device.ward}/patient/${result.beds[0].patient._id}`

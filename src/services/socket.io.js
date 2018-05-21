@@ -34,12 +34,13 @@ module.exports = (io) => {
       }
     })
 
-    socket.on('joinward', (ward) => {
-      socket.join(ward)
+    socket.on('join', (room) => {
+      console.log('joined')
+      socket.join(room)
     })
 
-    socket.on('leaveward', (ward) => {
-      socket.leave(ward)
+    socket.on('leave', (room) => {
+      socket.leave(room)
     })
   })
 }

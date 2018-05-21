@@ -31,7 +31,12 @@ client.on('message', (topic, payload, packet) => {
       if (i % 2 === 0) props[elem] = arr[i + 1] ? arr[i + 1] : null
     })
 
-    global.io.emit(`wards/${props.wards}`, payload.toString())
+    const data = {
+      type: props.type,
+      value: payload.toString()
+    }
+
+    global.io.to(`wards/${props.wards}`).emit(`patient${props.patient}`, data)
   }
 })
 
