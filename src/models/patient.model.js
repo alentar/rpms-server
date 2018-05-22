@@ -7,8 +7,12 @@ const APIError = require('../utils/APIError')
 const recordSchema = new mongoose.Schema({
   value: {
     type: Number
+  },
+
+  time: {
+    type: Date
   }
-}, { timestamps: true })
+})
 
 const patientSchema = new mongoose.Schema({
   bht: {
@@ -35,7 +39,7 @@ const patientSchema = new mongoose.Schema({
 
   admittedAt: {
     type: Date,
-    default: Date.now()
+    default: null
   },
 
   discharged: {
