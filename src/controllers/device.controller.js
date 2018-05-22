@@ -5,7 +5,6 @@ const Device = require('../models/device.model')
 const Ward = require('../models/ward.model')
 const httpStatus = require('http-status')
 const APIError = require('../utils/APIError')
-const DeviceError = require('../utils/DeviceError')
 const ObjectId = require('mongoose').Types.ObjectId
 const { pick } = require('lodash')
 
@@ -34,17 +33,23 @@ exports.selfAuthenticate = async (req, res, next) => {
 
       // we need to return that the device is registered
       res.status(httpStatus.CREATED)
-      return res.json({
-        'status': 'created',
-        'deviceID': device._id
-      })
+      return res.json(deviceResponse(device._id, 'created', null))
     }
 
-    if (device.isBlacklisted()) throw new DeviceError('Device blacklisted', 'blacklisted', httpStatus.FORBIDDEN)
+    if (device.isBlacklisted()) {
+      res.status(httpStatus.FORBIDDEN)
+      return res.json(deviceResponse(device._id, 'blacklisted', null))
+    }
 
-    if (!device.isAuthorized()) throw new DeviceError('Device not authorized', 'unauthorized', httpStatus.FORBIDDEN)
+    if (!device.isAuthorized()) {
+      res.status(httpStatus.FORBIDDEN)
+      return res.json(deviceResponse(device._id, 'unauthorized', null))
+    }
 
-    if (!device.isAssigned()) throw new DeviceError('Device not assigned', 'wait', httpStatus.FORBIDDEN)
+    if (!device.isAssigned()) {
+      res.status(httpStatus.FORBIDDEN)
+      return res.json(deviceResponse(device._id, 'unassigned', null))
+    }
 
     if (!device.hasTopic()) {
       if (device.bed !== null) {
@@ -60,22 +65,25 @@ exports.selfAuthenticate = async (req, res, next) => {
 
         if (result.beds.length === 0) {
           await Device.findByIdAndUpdate(device._id, { bed: null, ward: null })
-          throw new DeviceError('Device not assigned', 'wait', httpStatus.FORBIDDEN)
+          res.status(httpStatus.FORBIDDEN)
+          return res.json(deviceResponse(device._id, 'unassigned', null))
         }
 
         if (result.beds[0].patient !== null && result.beds[0].patient !== undefined) {
           const mqttTopic = `wards/${device.ward}/patient/${result.beds[0].patient._id}`
           await Device.findByIdAndUpdate(device._id, { mqttTopic: mqttTopic })
-          return res.json({id: device._id, status: 'operate', mqttTopic: mqttTopic})
+          return res.json(deviceResponse(device._id, 'operate', mqttTopic))
         } else {
-          throw new DeviceError('Device has no topic', 'wait', httpStatus.FORBIDDEN)
+          res.status(httpStatus.FORBIDDEN)
+          return res.json(deviceResponse(device._id, 'unassigned', null))
         }
       }
 
-      throw new DeviceError('Device has no topic', 'wait', httpStatus.FORBIDDEN)
+      res.status(httpStatus.FORBIDDEN)
+      return res.json(deviceResponse(device._id, 'unassigned', null))
     }
 
-    return res.json({id: device._id, status: 'operate', mqttTopic: device.mqttTopic})
+    return res.json(deviceResponse(device._id, 'operate', device.mqttTopic))
   } catch (error) {
     return next(error)
   }
@@ -331,4 +339,8 @@ exports.detachDevice = async (req, res, next) => {
   } catch (error) {
     return next(error)
   }
+}
+
+const deviceResponse = (id, state, mqttTopic) => {
+  return {id: id, state: state, mqttTopic: mqttTopic}
 }
