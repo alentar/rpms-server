@@ -35,7 +35,7 @@ const patientSchema = new mongoose.Schema({
 
   admittedAt: {
     type: Date,
-    default: Date.now()
+    default: null
   },
 
   discharged: {

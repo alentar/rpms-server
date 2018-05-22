@@ -21,6 +21,7 @@ exports.admit = async (req, res, next) => {
 
     const record = req.body
     record.admittedBy = req.user._id
+    record.admittedAt = Date.now()
 
     // we need more validation logic, but i laeve it here
 
