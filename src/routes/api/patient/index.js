@@ -16,6 +16,9 @@ router.delete('/discharge/:patient', auth(), patientController.discharge)
 // delete a patient
 router.delete('/:patient', auth(), patientController.delete)
 
+// view records of a patient
+router.get('/:patient/records', auth(), patientController.records)
+
 // view a patient
 router.get('/:patient', auth(), patientController.view)
 
