@@ -183,3 +183,51 @@ exports.index = async (req, res, next) => {
     return next(error)
   }
 }
+
+exports.records = async (req, res, next) => {
+  try {
+    if (!ObjectId.isValid(req.params.patient)) throw new APIError('Invalid patient', httpStatus.INTERNAL_SERVER_ERROR)
+    if (!req.query.type) throw new APIError('Type must be specified', httpStatus.INTERNAL_SERVER_ERROR)
+
+    const project = {_id: 0}
+    project[`records.${req.query.type}`] = 1
+
+    const sort1 = {}
+    sort1[`records.${req.query.type}.time`] = -1
+
+    const sort2 = {}
+    sort2[`records.${req.query.type}.time`] = 1
+
+    const result = await Patient.aggregate([
+      {
+        $match: {
+          _id: ObjectId(req.params.patient)
+        }
+      },
+      {
+        $project: project
+      },
+      {
+        $unwind: '$records.' + req.query.type
+      },
+      {
+        $sort: sort1
+      },
+      {
+        $limit: 50
+      },
+      {
+        $sort: sort2
+      }
+    ])
+
+    const data = result.map(v => {
+      const t = new Date(v.records[req.query.type].time)
+      return { x: v.records[req.query.type].time, y: v.records[req.query.type].value }
+    })
+
+    return res.json({ 'records': data })
+  } catch (error) {
+    return next(error)
+  }
+}

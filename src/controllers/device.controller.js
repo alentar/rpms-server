@@ -33,22 +33,22 @@ exports.selfAuthenticate = async (req, res, next) => {
 
       // we need to return that the device is registered
       res.status(httpStatus.CREATED)
-      return res.json(deviceResponse(device._id, 'created', null))
+      return res.json(deviceResponse(device._id, 'created', 'null'))
     }
 
     if (device.isBlacklisted()) {
       res.status(httpStatus.FORBIDDEN)
-      return res.json(deviceResponse(device._id, 'blacklisted', null))
+      return res.json(deviceResponse(device._id, 'blacklisted', 'null'))
     }
 
     if (!device.isAuthorized()) {
       res.status(httpStatus.FORBIDDEN)
-      return res.json(deviceResponse(device._id, 'unauthorized', null))
+      return res.json(deviceResponse(device._id, 'unauthorized', 'null'))
     }
 
     if (!device.isAssigned()) {
       res.status(httpStatus.FORBIDDEN)
-      return res.json(deviceResponse(device._id, 'unassigned', null))
+      return res.json(deviceResponse(device._id, 'unassigned', 'null'))
     }
 
     if (!device.hasTopic()) {
@@ -66,7 +66,7 @@ exports.selfAuthenticate = async (req, res, next) => {
         if (result.beds.length === 0) {
           await Device.findByIdAndUpdate(device._id, { bed: null, ward: null })
           res.status(httpStatus.FORBIDDEN)
-          return res.json(deviceResponse(device._id, 'unassigned', null))
+          return res.json(deviceResponse(device._id, 'unassigned', 'null'))
         }
 
         if (result.beds[0].patient !== null && result.beds[0].patient !== undefined) {
@@ -75,12 +75,12 @@ exports.selfAuthenticate = async (req, res, next) => {
           return res.json(deviceResponse(device._id, 'operate', mqttTopic))
         } else {
           res.status(httpStatus.FORBIDDEN)
-          return res.json(deviceResponse(device._id, 'unassigned', null))
+          return res.json(deviceResponse(device._id, 'unassigned', 'null'))
         }
       }
 
       res.status(httpStatus.FORBIDDEN)
-      return res.json(deviceResponse(device._id, 'unassigned', null))
+      return res.json(deviceResponse(device._id, 'unassigned', 'null'))
     }
 
     return res.json(deviceResponse(device._id, 'operate', device.mqttTopic))
