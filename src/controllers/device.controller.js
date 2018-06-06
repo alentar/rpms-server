@@ -32,22 +32,22 @@ exports.selfAuthenticate = async (req, res, next) => {
       global.io.emit('device', device)
 
       // we need to return that the device is registered
-      res.status(httpStatus.CREATED)
+      res.status(httpStatus.OK)
       return res.json(deviceResponse(device._id, 'created', 'null'))
     }
 
     if (device.isBlacklisted()) {
-      res.status(httpStatus.FORBIDDEN)
+      res.status(httpStatus.OK)
       return res.json(deviceResponse(device._id, 'blacklisted', 'null'))
     }
 
     if (!device.isAuthorized()) {
-      res.status(httpStatus.FORBIDDEN)
+      res.status(httpStatus.OK)
       return res.json(deviceResponse(device._id, 'unauthorized', 'null'))
     }
 
     if (!device.isAssigned()) {
-      res.status(httpStatus.FORBIDDEN)
+      res.status(httpStatus.OK)
       return res.json(deviceResponse(device._id, 'unassigned', 'null'))
     }
 
