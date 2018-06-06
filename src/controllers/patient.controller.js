@@ -222,7 +222,6 @@ exports.records = async (req, res, next) => {
     ])
 
     const data = result.map(v => {
-      const t = new Date(v.records[req.query.type].time)
       return { x: v.records[req.query.type].time, y: v.records[req.query.type].value }
     })
 
