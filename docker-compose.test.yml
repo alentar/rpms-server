@@ -18,7 +18,7 @@ services:
       - "3000:3000"
     networks:
       - webnet
-    command: npm run start
+    command: npm run test
     volumes:
       - ./:/usr/src/app
       - ./node_modules:/usr/src/app/node_modules
@@ -26,6 +26,7 @@ services:
       - mongo
       - redis
       - mqtt
+    tty: true
 
 
   mongo:
@@ -67,26 +68,6 @@ services:
       - "1883:1883"
     depends_on:
       - mongo
-    networks:
-      - webnet
-
-  frontend:
-    container_name: frontend
-    image: rpms/frontend:1.0
-    ports:
-      - "8000:80"
-    networks:
-      - webnet
-
-  visualizer:
-    image: dockersamples/visualizer:stable
-    ports:
-      - "8080:8080"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-    deploy:
-      placement:
-        constraints: [node.role == manager]
     networks:
       - webnet
 
